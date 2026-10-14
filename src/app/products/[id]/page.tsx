@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import ProductImage from "@/components/ProductImage";
 import StockBadge from "@/components/StockBadge";
+import AddToCartButton from "@/components/AddToCartButton";
 import { catalogHref } from "@/lib/catalog-url";
 import { formatPrice, stockStatus } from "@/lib/format";
 import { getProduct } from "@/lib/products";
@@ -63,14 +64,13 @@ export default async function ProductPage(props: PageProps<"/products/[id]">) {
           <h2 className="mt-6 font-semibold">รายละเอียดสินค้า</h2>
           <p className="mt-1 max-w-prose leading-relaxed text-ink-soft">{product.description}</p>
 
-          <button
-            type="button"
-            disabled
-            className="mt-8 rounded-lg bg-brand px-6 py-3 font-medium text-white disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            เพิ่มลงตะกร้า
-          </button>
-          <p className="mt-2 text-sm text-ink-soft">ตะกร้าสินค้าจะเปิดใช้งานในขั้นตอนถัดไปของโปรเจกต์</p>
+          <div className="mt-8">
+            <AddToCartButton
+              productId={product.id}
+              stock={product.stock}
+              showQuantityPicker={true}
+            />
+          </div>
         </div>
       </div>
     </main>
