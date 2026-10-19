@@ -53,6 +53,15 @@ export default async function Header() {
           {/* แถบผู้ใช้ / ล็อกอิน */}
           {user ? (
             <div className="flex items-center gap-2 sm:gap-3">
+              {user.role === "admin" && (
+                <Link
+                  href="/admin"
+                  id="nav-admin-btn"
+                  className="rounded-lg bg-brand/10 border border-brand/30 px-2.5 py-1.5 text-xs sm:text-sm font-semibold text-brand hover:bg-brand hover:text-white transition-colors"
+                >
+                  ⚙ จัดการระบบ
+                </Link>
+              )}
               <Link
                 href="/orders"
                 className="hidden rounded-lg px-2.5 py-1.5 text-sm font-medium text-ink-soft transition-colors hover:text-brand sm:inline-block"

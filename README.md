@@ -98,4 +98,9 @@ Vercel ไม่เก็บไฟล์ที่เขียนระหว่�
   - ระบบสมาชิกและ Session (สมัครสมาชิก, เข้าสู่ระบบ, ออกจากระบบ, bcrypt + HTTP-only signed cookie)
   - ระบบ Checkout และตัดสต็อกแบบ Database Transaction ปลอดภัยจาก Race Condition
   - ประวัติคำสั่งซื้อ (`/orders`, `/orders/[id]`) และการจัดการที่อยู่จัดส่ง (`/profile`)
-- **สัปดาห์ที่ 3 (ถัดไป)**: ระบบหลังบ้าน Admin: Inventory Management (ปรับสต็อก/เพิ่ม/แก้ไขสินค้า) และ Order Management (เปลี่ยนสถานะออเดอร์)
+- **สัปดาห์ที่ 3 (เสร็จสิ้น)**: ระบบหลังบ้าน (Admin Panel)
+  - กำหนดสิทธิ์การเข้าถึงเฉพาะแอดมิน (`role === 'admin'`) พร้อมปุ่ม "⚙ จัดการระบบ" บน Header
+  - **Inventory Management** (`/admin/inventory`): เพิ่ม แก้ไข ลบสินค้า ปรับจำนวนสต็อกแบบรวดเร็ว และแจ้งเตือนสต็อกต่ำกว่าเกณฑ์
+  - **Order Management** (`/admin/orders`): ตารางคำสั่งซื้อทั้งหมด ค้นหา กรองตามสถานะ ปรับเปลี่ยนสถานะคำสั่งซื้อ และใส่เลขพัสดุ (Tracking Number)
+  - หน้ารายละเอียดคำสั่งซื้อสำหรับแอดมิน (`/admin/orders/[id]`)
+- **สัปดาห์ที่ 4 (ถัดไป)**: Dashboard รายได้/ยอดขาย, Cookie Consent Banner (PDPA), หน้านโยบายคุกกี้ และบันทึก consent_logs

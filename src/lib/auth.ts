@@ -1,6 +1,7 @@
 import "server-only";
 import crypto from "node:crypto";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import bcrypt from "bcryptjs";
 import { getDb } from "./db";
 
@@ -154,4 +155,23 @@ export async function getCurrentUser(): Promise<User | null> {
   if (!payload) return null;
 
   return getUserById(payload.userId);
+}
+
+export async function requireUser(): Promise<User> {
+  const user = await getCurrentUser();
+  if (!user) {
+    redirect("/login");
+  }
+  return user;
+}
+
+export async function requireAdmin(): Promise<User> {
+  const user = await getCurrentUser();
+  if (!user) {
+    redirect("/login?redirect=/admin");
+  }
+  if (user.role !== "admin") {
+    redirect("/");
+  }
+  return user;
 }
