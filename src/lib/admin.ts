@@ -304,3 +304,165 @@ export function getAdminStats() {
     pendingOrders,
   };
 }
+
+export type ConsentLog = {
+  id: number;
+  visitor_id: string;
+  user_id: number | null;
+  customer_name?: string | null;
+  analytics: number;
+  functional: number;
+  marketing: number;
+  policy_version: string;
+  created_at: string;
+};
+
+export function logConsent(data: {
+  visitorId: string;
+  userId?: number | null;
+  analytics: boolean;
+  functional: boolean;
+  marketing: boolean;
+  policyVersion: string;
+}): void {
+  const db = getDb();
+  db.prepare(
+    `INSERT INTO consent_logs (visitor_id, user_id, analytics, functional, marketing, policy_version)
+     VALUES (?, ?, ?, ?, ?, ?)`
+  ).run(
+    data.visitorId,
+    data.userId ?? null,
+    data.analytics ? 1 : 0,
+    data.functional ? 1 : 0,
+    data.marketing ? 1 : 0,
+    data.policyVersion
+  );
+}
+
+export function listConsentLogs(limit = 20): ConsentLog[] {
+  const db = getDb();
+  return db
+    .prepare(
+      `SELECT cl.id, cl.visitor_id, cl.user_id, u.name AS customer_name,
+              cl.analytics, cl.functional, cl.marketing, cl.policy_version, cl.created_at
+         FROM consent_logs cl
+         LEFT JOIN users u ON u.id = cl.user_id
+        ORDER BY cl.id DESC
+        LIMIT ?`
+    )
+    .all(limit) as ConsentLog[];
+}
+
+export function getAdminDashboardData() {
+  const db = getDb();
+
+  // ยอดขายสุทธิที่ชำระหรือกำลังจัดส่งแล้ว
+  const revenueRow = db
+    .prepare(
+      `SELECT COALESCE(SUM(total), 0) AS revenue
+         FROM orders
+        WHERE status IN ('paid', 'shipped', 'delivered')`
+    )
+    .get() as { revenue: number };
+
+  const pendingRevenueRow = db
+    .prepare(
+      `SELECT COALESCE(SUM(total), 0) AS pending_revenue
+         FROM orders
+        WHERE status = 'pending'`
+    )
+    .get() as { pending_revenue: number };
+
+  const totalOrders = (
+    db.prepare("SELECT COUNT(*) AS c FROM orders").get() as { c: number }
+  ).c;
+
+  const ordersByStatus = {
+    pending: (
+      db.prepare("SELECT COUNT(*) AS c FROM orders WHERE status = 'pending'").get() as { c: number }
+    ).c,
+    paid: (
+      db.prepare("SELECT COUNT(*) AS c FROM orders WHERE status = 'paid'").get() as { c: number }
+    ).c,
+    shipped: (
+      db.prepare("SELECT COUNT(*) AS c FROM orders WHERE status = 'shipped'").get() as { c: number }
+    ).c,
+    delivered: (
+      db.prepare("SELECT COUNT(*) AS c FROM orders WHERE status = 'delivered'").get() as { c: number }
+    ).c,
+    cancelled: (
+      db.prepare("SELECT COUNT(*) AS c FROM orders WHERE status = 'cancelled'").get() as { c: number }
+    ).c,
+  };
+
+  const totalProducts = (
+    db.prepare("SELECT COUNT(*) AS c FROM products WHERE is_active = 1").get() as { c: number }
+  ).c;
+
+  // สินค้าที่สต็อกต่ำกว่าเกณฑ์
+  const lowStockProducts = db
+    .prepare(
+      `SELECT p.id, p.name, p.price, p.stock, p.low_stock_threshold, c.name AS category_name
+         FROM products p
+         JOIN categories c ON c.id = p.category_id
+        WHERE p.is_active = 1 AND p.stock <= p.low_stock_threshold
+        ORDER BY p.stock ASC`
+    )
+    .all() as {
+      id: number;
+      name: string;
+      price: number;
+      stock: number;
+      low_stock_threshold: number;
+      category_name: string;
+    }[];
+
+  // คำสั่งซื้อล่าสุด 6 รายการ
+  const recentOrders = db
+    .prepare(
+      `SELECT o.id, o.user_id, u.name AS customer_name, o.status, o.total, o.created_at
+         FROM orders o
+         JOIN users u ON u.id = o.user_id
+        ORDER BY o.id DESC
+        LIMIT 6`
+    )
+    .all() as {
+      id: number;
+      user_id: number;
+      customer_name: string;
+      status: OrderStatus;
+      total: number;
+      created_at: string;
+    }[];
+
+  // ยอดขายแยกตามหมวดหมู่สินค้า
+  const salesByCategory = db
+    .prepare(
+      `SELECT c.name AS category_name,
+              COALESCE(SUM(oi.quantity * oi.unit_price), 0) AS total_revenue,
+              COALESCE(SUM(oi.quantity), 0) AS total_sold
+         FROM categories c
+         LEFT JOIN products p ON p.category_id = c.id
+         LEFT JOIN order_items oi ON oi.product_id = p.id
+        GROUP BY c.id
+        ORDER BY total_revenue DESC`
+    )
+    .all() as { category_name: string; total_revenue: number; total_sold: number }[];
+
+  const consentCount = (
+    db.prepare("SELECT COUNT(*) AS c FROM consent_logs").get() as { c: number }
+  ).c;
+
+  return {
+    totalRevenue: revenueRow.revenue,
+    pendingRevenue: pendingRevenueRow.pending_revenue,
+    totalOrders,
+    ordersByStatus,
+    totalProducts,
+    lowStockProducts,
+    recentOrders,
+    salesByCategory,
+    consentCount,
+  };
+}
+

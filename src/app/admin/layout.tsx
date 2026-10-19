@@ -46,10 +46,16 @@ export default async function AdminLayout({
         </div>
 
         {/* แถบเมนูนำทางหลักใน Admin */}
-        <div className="mx-auto flex w-full max-w-6xl gap-2 px-4 overflow-x-auto text-sm">
+        <div className="mx-auto flex w-full max-w-6xl gap-4 px-4 overflow-x-auto text-sm">
+          <Link
+            href="/admin"
+            className="flex items-center gap-2 border-b-2 border-transparent px-2 py-3 font-medium text-ink-soft hover:border-brand hover:text-brand"
+          >
+            <span>📊 แดชบอร์ดภาพรวม</span>
+          </Link>
           <Link
             href="/admin/inventory"
-            className="flex items-center gap-2 border-b-2 border-brand px-3 py-3 font-semibold text-brand"
+            className="flex items-center gap-2 border-b-2 border-transparent px-2 py-3 font-medium text-ink-soft hover:border-brand hover:text-brand"
           >
             <span>📦 สินค้าและสต็อก</span>
             {stats.lowStockCount > 0 && (
@@ -60,14 +66,20 @@ export default async function AdminLayout({
           </Link>
           <Link
             href="/admin/orders"
-            className="flex items-center gap-2 border-b-2 border-transparent px-3 py-3 font-medium text-ink-soft hover:border-line hover:text-ink"
+            className="flex items-center gap-2 border-b-2 border-transparent px-2 py-3 font-medium text-ink-soft hover:border-brand hover:text-brand"
           >
-            <span>📋 คำสั่งซื้อทั้งหมด</span>
+            <span>📋 คำสั่งซื้อ</span>
             {stats.pendingOrders > 0 && (
               <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-blue-600 px-1.5 text-[11px] font-bold text-white" title={`${stats.pendingOrders} ออเดอร์รอดำเนินการ`}>
                 {stats.pendingOrders}
               </span>
             )}
+          </Link>
+          <Link
+            href="/admin/consent-logs"
+            className="flex items-center gap-2 border-b-2 border-transparent px-2 py-3 font-medium text-ink-soft hover:border-brand hover:text-brand"
+          >
+            <span>🛡️ บันทึกความยินยอม PDPA</span>
           </Link>
         </div>
       </div>

@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ThirdPartyScripts from "@/components/ThirdPartyScripts";
+import CookieConsentBanner from "@/components/CookieConsentBanner";
 
 export const metadata: Metadata = {
   title: { default: "VitaShop | วิตามินและอาหารเสริม", template: "%s | VitaShop" },
@@ -17,6 +18,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Header />
         <div className="flex-1">{children}</div>
         <Footer />
+        <CookieConsentBanner />
         <ThirdPartyScripts />
       </body>
     </html>
