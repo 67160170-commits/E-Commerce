@@ -3,7 +3,11 @@
 // เปลี่ยนที่อยู่เว็บด้วย BASE_URL=http://localhost:3000
 
 const base = process.env.BASE_URL ?? "http://localhost:3000";
-const paths = ["/", "/?q=" + encodeURIComponent("วิตามิน"), "/?category=2", "/products/1"];
+const home = await fetch(base);
+const markup = await home.text();
+const productPath = markup.match(/href="(\/products\/\d+)"/)?.[1];
+if (!productPath) throw new Error("ไม่พบลิงก์สินค้า: ตรวจสอบฐานข้อมูล My YaDom");
+const paths = ["/", "/?q=" + encodeURIComponent("ยาดม"), "/?sort=rating", "/rankings", productPath];
 const trackerHosts = [
   "google-analytics", "googletagmanager", "doubleclick", "googlesyndication",
   "facebook.net", "connect.facebook", "hotjar", "clarity.ms", "segment.com",

@@ -151,7 +151,7 @@ export default function CookieConsentBanner() {
             </h3>
           </div>
           <p className="text-xs sm:text-sm text-ink-soft leading-relaxed">
-            เว็บไซต์ VitaShop มีการใช้งานคุกกี้เพื่อความจำเป็นในการทำงานของระบบ (เช่น การเข้าสู่ระบบ และการสั่งซื้อสินค้า)
+            เว็บไซต์ My YaDom มีการใช้งานคุกกี้เพื่อความจำเป็นในการทำงานของระบบ (เช่น การเข้าสู่ระบบ และการสั่งซื้อสินค้า)
             รวมถึงคุกกี้เพื่อพัฒนาประสบการณ์และบริการ หากคุณยินยอม{" "}
             <Link
               href="/cookie-policy"

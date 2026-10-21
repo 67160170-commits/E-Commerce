@@ -47,7 +47,7 @@ export default function ProductForm({ categories, initialData }: Props) {
             name="name"
             required
             defaultValue={initialData?.name}
-            placeholder="เช่น วิตามินซี 1,000 มก. (60 เม็ด)"
+            placeholder="เช่น โป๊ยเซียน มาร์คทู"
             className="mt-1 block w-full rounded-xl border border-line bg-white px-3.5 py-2.5 text-sm shadow-sm focus:border-brand focus:outline-none"
           />
         </div>

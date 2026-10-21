@@ -1,108 +1,70 @@
 import Link from "next/link";
 import CategoryFilter from "@/components/CategoryFilter";
 import ProductCard from "@/components/ProductCard";
+import ProductImage from "@/components/ProductImage";
+import RankingSection from "@/components/RankingSection";
 import { SORT_OPTIONS, catalogHref, isSortKey, type SortKey } from "@/lib/catalog-url";
 import { listCategories, listProducts } from "@/lib/products";
 
 export const dynamic = "force-dynamic";
-
-function firstValue(value: string | string[] | undefined): string | undefined {
-  return Array.isArray(value) ? value[0] : value;
-}
+const firstValue = (value: string | string[] | undefined) => Array.isArray(value) ? value[0] : value;
 
 export default async function CatalogPage(props: PageProps<"/">) {
   const params = await props.searchParams;
-
   const q = (firstValue(params.q) ?? "").trim().slice(0, 100);
   const categoryId = Number(firstValue(params.category)) || undefined;
   const sortParam = firstValue(params.sort);
   const sort: SortKey = isSortKey(sortParam) ? sortParam : "recommended";
-
   const categories = listCategories();
-  const activeCategory = categories.find((category) => category.id === categoryId);
+  const activeCategory = categories.find((c) => c.id === categoryId);
   const products = listProducts({ q, categoryId: activeCategory?.id, sort });
-  const filtered = Boolean(q || activeCategory);
+  const allProducts = listProducts({ sort: "rating" });
+  const filtered = Boolean(q || activeCategory || sort !== "recommended");
+  const CatalogHeading = filtered ? "h1" : "h2";
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 py-8">
-      <h1 className="text-3xl font-bold tracking-tight">วิตามินและอาหารเสริม</h1>
-      <p className="mt-1 text-ink-soft">ค้นหาจากชื่อหรือรายละเอียดสินค้า หรือเลือกดูตามหมวดหมู่</p>
-
-      <form action="/" method="get" role="search" className="mt-5 flex gap-2">
-        <input
-          type="search"
-          name="q"
-          defaultValue={q}
-          maxLength={100}
-          placeholder="เช่น วิตามินซี, น้ำมันปลา"
-          aria-label="ค้นหาสินค้า"
-          className="min-w-0 flex-1 rounded-lg border border-line bg-white px-4 py-2.5 placeholder:text-ink-soft/70"
-        />
-        {activeCategory && <input type="hidden" name="category" value={activeCategory.id} />}
-        {sort !== "recommended" && <input type="hidden" name="sort" value={sort} />}
-        <button
-          type="submit"
-          className="rounded-lg bg-brand px-6 py-2.5 font-medium text-white hover:bg-brand-deep"
-        >
-          ค้นหา
-        </button>
-      </form>
-
-      <div className="mt-4">
-        <CategoryFilter categories={categories} activeId={activeCategory?.id} q={q} sort={sort} />
+    <main>
+      {!filtered && <>
+        <section className="hero-shell">
+          <div className="hero-copy">
+            <p className="eyebrow"><span className="inline-block h-2 w-2 rounded-full bg-brand" /> A LITTLE INHALE. A BETTER DAY.</p>
+            <h1>โลกของยาดมไทย<br />ที่หอม…<span>เป็นคุณ</span><span className="hero-spark" aria-hidden>✳</span></h1>
+            <p className="hero-description">กลิ่นคุ้นเคย หรือกลิ่นใหม่ที่อยากลอง<br />ค้นพบยาดมไทย ร่วมจัดอันดับความหอม<br className="sm:hidden" /> แล้วพกกลิ่นโปรดไปด้วยกัน</p>
+            <div className="mt-7 flex flex-wrap items-center gap-5"><Link href="#catalog" className="primary-pill">ค้นหายาดมที่ใช่ <span aria-hidden>↗</span></Link><Link href="/rankings" className="text-link">ดูอันดับความหอม →</Link></div>
+            <div className="hero-note"><span className="text-xl" aria-hidden>✿</span><p>ยาดมเล็ก ๆ ความชอบที่ไม่เหมือนใคร<br /><span>ค้นพบ · ให้คะแนน · ช้อป ในที่เดียว</span></p></div>
+          </div>
+          <div className="hero-art" aria-label="ภาพวาดยาดมหลากสไตล์">
+            <span className="art-orbit" /><span className="art-spark" aria-hidden>✳</span>
+            <span className="art-tag">THAI LITTLE ESSENTIALS</span>
+            <div className="art-bottle art-bottle-left"><ProductImage categoryId={1} imageUrl="/products/tube-mint.svg" alt="ภาพประกอบยาดมแบบหลอด" className="h-full w-full" /></div>
+            <div className="art-bottle art-bottle-center"><ProductImage categoryId={1} imageUrl="/products/herbal-green.svg" alt="ภาพประกอบยาดมสมุนไพร" className="h-full w-full" /></div>
+            <div className="art-bottle art-bottle-right"><ProductImage categoryId={1} imageUrl="/products/tube-orange.svg" alt="ภาพประกอบยาดมอโรมา" className="h-full w-full" /></div>
+            <span className="art-sticker">small jar,<br /><strong>big freshness.</strong></span>
+            <span className="art-caption">ภาพประกอบจำลอง ไม่ใช่บรรจุภัณฑ์จริง</span>
+          </div>
+        </section>
+        <div className="brand-strip"><span>YOUR EVERYDAY FRESHNESS</span><span>โป๊ยเซียน</span><span>หงส์ไทย</span><span>เซียงเพียว</span><span>PEPPERMINT FIELD</span><span className="text-brand" aria-hidden>✳</span></div>
+      </>}
+      <div className="mx-auto w-full max-w-6xl px-4">
+        <section id="catalog" className="catalog-section scroll-mt-36">
+          <div className="section-heading"><div><p className="eyebrow">FIND YOUR EVERYDAY SCENT</p><CatalogHeading className="mt-2 text-3xl font-semibold">{filtered ? "ค้นหากลิ่นที่คุณชอบ" : "กลิ่นไหนที่เป็นคุณ?"}</CatalogHeading></div><p className="text-sm text-ink-soft">ยาดมไทย {allProducts.length} รายการ และกำลังเพิ่มอีกเรื่อย ๆ</p></div>
+          <form action="/#catalog" method="get" role="search" className="catalog-search">
+            <span className="pl-2 text-xl text-brand" aria-hidden>⌕</span>
+            <input type="search" name="q" defaultValue={q} maxLength={100} placeholder="ค้นหาชื่อยาดม แบรนด์ หรือกลิ่นที่ชอบ…" aria-label="ค้นหายาดม" className="min-w-0 flex-1 bg-transparent px-2 py-3 text-sm" />
+            {activeCategory && <input type="hidden" name="category" value={activeCategory.id} />}
+            {sort !== "recommended" && <input type="hidden" name="sort" value={sort} />}
+            <button className="rounded-full bg-brand px-6 py-3 text-sm font-medium text-white hover:bg-brand-deep">ค้นหา</button>
+          </form>
+          <div className="mt-5"><CategoryFilter categories={categories} activeId={activeCategory?.id} q={q} sort={sort} /></div>
+          <div className="mt-7 flex flex-wrap items-center justify-between gap-4 border-t border-line pt-5 text-xs">
+            <p aria-live="polite">พบ <strong>{products.length}</strong> รายการ {q && <>สำหรับ “{q}” </>}{activeCategory && <>ในหมวด {activeCategory.name} </>}{filtered && <Link href="/#catalog" className="ml-2 text-brand underline">ล้างตัวกรอง</Link>}</p>
+            <nav aria-label="เรียงลำดับสินค้า" className="flex flex-wrap items-center gap-3"><span className="text-ink-soft">เรียงตาม</span>{SORT_OPTIONS.map((option) => <Link key={option.key} href={`${catalogHref({ q, category: activeCategory?.id, sort: option.key })}#catalog`} aria-current={sort === option.key ? "true" : undefined} className={sort === option.key ? "font-semibold text-brand underline underline-offset-4" : "text-ink-soft hover:text-brand"}>{option.label}</Link>)}</nav>
+          </div>
+          {products.length ? <ul className="mt-6 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">{products.map((product) => <ProductCard key={product.id} product={product} />)}</ul> : <div className="my-6 rounded-2xl border border-dashed border-line p-12 text-center"><h3 className="font-semibold">ยังไม่พบกลิ่นที่ค้นหา</h3><p className="mt-2 text-sm text-ink-soft">ลองใช้ชื่อแบรนด์ หรือเลือกหมวดหมู่อื่น</p><Link href="/#catalog" className="mt-5 inline-block text-sm text-brand underline">ดูยาดมทั้งหมด</Link></div>}
+          <p className="mt-5 text-xs leading-6 text-ink-soft">ราคา สต็อก และคำบรรยายกลิ่นเป็นข้อมูลตัวอย่างสำหรับการศึกษา ภาพเป็นภาพประกอบจำลอง</p>
+        </section>
+        {!filtered && <><RankingSection products={allProducts} /><section className="community-banner"><span className="community-flower" aria-hidden>✳</span><div><p className="eyebrow">A SCENT OF COMMUNITY</p><h2>ความหอม ไม่มีคำตอบเดียว</h2><p className="mt-3 text-sm leading-7">ชอบกลิ่นไหน บอกต่อกลิ่นนั้น<br />ให้คะแนนยาดมที่เคยลอง แล้วช่วยเพื่อน ๆ ค้นพบกลิ่นใหม่</p></div><Link href="/rankings" className="primary-pill">ร่วมค้นหากลิ่นโปรด ↗</Link></section></>}
       </div>
-
-      <div className="mt-6 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 text-sm">
-        <p aria-live="polite">
-          พบ <strong>{products.length}</strong> รายการ
-          {q && <> สำหรับ “{q}”</>}
-          {activeCategory && <> ในหมวด {activeCategory.name}</>}
-          {filtered && (
-            <>
-              {" "}
-              <Link href="/" className="ml-1 text-brand underline underline-offset-2">
-                ล้างตัวกรอง
-              </Link>
-            </>
-          )}
-        </p>
-        <nav aria-label="เรียงลำดับสินค้า" className="flex items-center gap-3">
-          <span className="text-ink-soft">เรียงตาม</span>
-          {SORT_OPTIONS.map((option) => (
-            <Link
-              key={option.key}
-              href={catalogHref({ q, category: activeCategory?.id, sort: option.key })}
-              aria-current={sort === option.key ? "true" : undefined}
-              className={
-                sort === option.key
-                  ? "font-semibold text-brand"
-                  : "text-ink-soft hover:text-brand"
-              }
-            >
-              {option.label}
-            </Link>
-          ))}
-        </nav>
-      </div>
-
-      {products.length > 0 ? (
-        <ul className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </ul>
-      ) : (
-        <div className="mt-4 rounded-xl border border-dashed border-line bg-white p-10 text-center">
-          <p className="font-medium">ไม่พบสินค้าที่ตรงกับเงื่อนไข</p>
-          <p className="mt-1 text-sm text-ink-soft">ลองค้นหาด้วยคำที่สั้นลง หรือเปลี่ยนหมวดหมู่</p>
-          <Link
-            href="/"
-            className="mt-4 inline-block rounded-lg bg-brand px-5 py-2 text-sm font-medium text-white hover:bg-brand-deep"
-          >
-            ดูสินค้าทั้งหมด
-          </Link>
-        </div>
-      )}
     </main>
   );
 }

@@ -13,11 +13,14 @@ export type Product = {
   category_id: number;
   category_name: string;
   stock: number;
+  average_rating: number | null;
+  review_count: number;
   low_stock_threshold: number;
 };
 
 const SORT_SQL: Record<SortKey, string> = {
   recommended: "p.id ASC",
+  rating: "average_rating DESC, review_count DESC, p.id ASC",
   "price-asc": "p.price ASC, p.id ASC",
   "price-desc": "p.price DESC, p.id ASC",
   name: "p.name COLLATE NOCASE ASC",
@@ -25,13 +28,15 @@ const SORT_SQL: Record<SortKey, string> = {
 
 const SELECT_PRODUCT = `
   SELECT p.id, p.name, p.description, p.price, p.image_url, p.category_id,
-         c.name AS category_name, p.stock, p.low_stock_threshold
+         c.name AS category_name, p.stock, p.low_stock_threshold,
+         (SELECT AVG(r.rating) FROM reviews r WHERE r.product_id = p.id) AS average_rating,
+         (SELECT COUNT(*) FROM reviews r WHERE r.product_id = p.id) AS review_count
     FROM products p
     JOIN categories c ON c.id = p.category_id`;
 
 export function listCategories(): Category[] {
   return getDb()
-    .prepare("SELECT id, name FROM categories ORDER BY sort_order, id")
+    .prepare("SELECT id, name FROM categories WHERE EXISTS (SELECT 1 FROM products p WHERE p.category_id = categories.id AND p.is_active = 1) ORDER BY sort_order, id")
     .all() as Category[];
 }
 

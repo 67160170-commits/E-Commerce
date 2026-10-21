@@ -49,7 +49,7 @@ export default function ThirdPartyScripts() {
         <script
           id="vitashop-analytics-script"
           dangerouslySetInnerHTML={{
-            __html: `/* VitaShop First-Party Analytics Activated with Consent */`,
+            __html: `/* My YaDom First-Party Analytics Activated with Consent */`,
           }}
         />
       )}
@@ -57,7 +57,7 @@ export default function ThirdPartyScripts() {
         <script
           id="vitashop-marketing-script"
           dangerouslySetInnerHTML={{
-            __html: `/* VitaShop Marketing Personalization Activated with Consent */`,
+            __html: `/* My YaDom Marketing Personalization Activated with Consent */`,
           }}
         />
       )}

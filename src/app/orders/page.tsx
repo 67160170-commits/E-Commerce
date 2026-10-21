@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "ประวัติคำสั่งซื้อ",
-  description: "รายการคำสั่งซื้อวิตามินและอาหารเสริมทั้งหมดของคุณ",
+  description: "รายการคำสั่งซื้อยาดมทั้งหมดของคุณ",
 };
 
 const STATUS_MAP: Record<OrderStatus, { label: string; bg: string; text: string }> = {

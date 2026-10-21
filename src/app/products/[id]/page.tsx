@@ -7,6 +7,9 @@ import AddToCartButton from "@/components/AddToCartButton";
 import { catalogHref } from "@/lib/catalog-url";
 import { formatPrice, stockStatus } from "@/lib/format";
 import { getProduct } from "@/lib/products";
+import { getCurrentUser } from "@/lib/auth";
+import { getMyReview, listReviews } from "@/lib/reviews";
+import ReviewForm from "@/components/ReviewForm";
 
 export const dynamic = "force-dynamic";
 
@@ -27,6 +30,9 @@ export default async function ProductPage(props: PageProps<"/products/[id]">) {
   if (!product) notFound();
 
   const status = stockStatus(product);
+  const user = await getCurrentUser();
+  const reviews = listReviews(product.id);
+  const myReview = user ? getMyReview(product.id, user.id) : undefined;
 
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-8">
@@ -63,6 +69,8 @@ export default async function ProductPage(props: PageProps<"/products/[id]">) {
 
           <h2 className="mt-6 font-semibold">รายละเอียดสินค้า</h2>
           <p className="mt-1 max-w-prose leading-relaxed text-ink-soft">{product.description}</p>
+          <p className="mt-4 text-sm text-brand">{product.review_count ? `★ ${product.average_rating?.toFixed(2)} / 5 จาก ${product.review_count} คะแนนความหอม` : "☆ ยังไม่มีคะแนนความหอม มาเป็นคนแรกที่รีวิว"}</p>
+          <p className="mt-3 text-xs leading-6 text-ink-soft">ราคา สต็อก และคำบรรยายกลิ่นเป็นข้อมูลตัวอย่าง ภาพประกอบไม่ใช่บรรจุภัณฑ์จริง</p>
 
           <div className="mt-8">
             <AddToCartButton
@@ -73,6 +81,15 @@ export default async function ProductPage(props: PageProps<"/products/[id]">) {
           </div>
         </div>
       </div>
+      <section id="reviews" className="mt-14 scroll-mt-36 border-t border-line pt-8">
+        <p className="eyebrow">YOUR SCENT, YOUR SAY</p>
+        <h2 className="mt-2 text-2xl font-bold">รีวิวความหอม</h2>
+        <p className="mt-2 text-sm text-ink-soft">ความชอบส่วนบุคคลจากสมาชิกทั่วไป ไม่ได้ยืนยันการซื้อ · แสดงรีวิวล่าสุดสูงสุด 50 รายการ</p>
+        <div className="mt-6 grid items-start gap-6 md:grid-cols-2">
+          {user ? <ReviewForm productId={product.id} existing={myReview} /> : <div className="rounded-2xl border border-line bg-white p-6"><h3 className="font-semibold">เคยลองกลิ่นนี้แล้ว?</h3><p className="mt-2 text-sm text-ink-soft">เข้าสู่ระบบเพื่อให้คะแนน และร่วมจัดอันดับยาดมที่คุณชอบ</p><Link href={`/login?redirect=${encodeURIComponent(`/products/${product.id}#reviews`)}`} className="mt-5 inline-block rounded-full bg-brand px-6 py-3 text-sm text-white">เข้าสู่ระบบเพื่อให้คะแนน ↗</Link></div>}
+          <div className="space-y-3">{reviews.length ? reviews.map((review) => <article key={review.id} className="rounded-2xl border border-line bg-white p-5"><div className="flex flex-wrap justify-between gap-2 text-sm"><h3 className="font-semibold">{review.name}</h3><span className="font-semibold text-brand">★ {review.rating} / 5</span></div>{review.comment && <p className="mt-3 whitespace-pre-wrap break-words text-sm leading-7 text-ink-soft">{review.comment}</p>}<p className="mt-3 text-xs text-ink-soft">อัปเดต {new Intl.DateTimeFormat("th-TH", { dateStyle: "medium", timeZone: "Asia/Bangkok" }).format(new Date(`${review.updated_at.replace(" ", "T")}Z`))}</p></article>) : <p className="rounded-2xl border border-dashed border-line p-8 text-sm text-ink-soft">ยังไม่มีรีวิว ให้กลิ่นโปรดของคุณเริ่มต้นบทสนทนา</p>}</div>
+        </div>
+      </section>
     </main>
   );
 }

@@ -12,12 +12,13 @@ export default async function Header() {
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-3.5">
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center gap-2 text-xl font-bold tracking-tight text-brand-deep">
-            <span aria-hidden className="inline-block h-5 w-5 rounded-full bg-citrus shadow-sm" />
-            VitaShop
+            <span aria-hidden className="brand-mark">✳</span>
+            <span>My YaDom<span className="ml-1 text-brand">.</span></span>
           </Link>
-          <span className="hidden text-xs text-ink-soft sm:inline-block border-l border-line pl-4">
-            วิตามินและอาหารเสริมเพื่อสุขภาพ
-          </span>
+          <nav aria-label="เมนูหลัก" className="hidden items-center gap-5 text-sm text-ink-soft lg:flex">
+            <Link href="/#catalog" className="hover:text-brand">รวมยาดม</Link>
+            <Link href="/rankings" className="hover:text-brand">อันดับความหอม ↗</Link>
+          </nav>
         </div>
 
         <div className="flex items-center gap-3 sm:gap-4">
@@ -117,6 +118,7 @@ export default async function Header() {
           )}
         </div>
       </div>
+      <nav aria-label="เมนูหลักบนมือถือ" className="flex justify-center gap-8 border-t border-line px-4 py-2 text-xs text-ink-soft lg:hidden"><Link href="/#catalog">รวมยาดม</Link><Link href="/rankings">อันดับความหอม ↗</Link></nav>
     </header>
   );
 }

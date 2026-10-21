@@ -23,7 +23,7 @@ export default function CategoryFilter({ categories, activeId, q, sort }: Props)
       <ul className="flex gap-2 pb-1">
         <li>
           <Link
-            href={catalogHref({ q, sort })}
+            href={`${catalogHref({ q, sort })}#catalog`}
             className={chipClass(!activeId)}
             aria-current={!activeId ? "true" : undefined}
           >
@@ -33,7 +33,7 @@ export default function CategoryFilter({ categories, activeId, q, sort }: Props)
         {categories.map((category) => (
           <li key={category.id}>
             <Link
-              href={catalogHref({ q, sort, category: category.id })}
+              href={`${catalogHref({ q, sort, category: category.id })}#catalog`}
               className={chipClass(activeId === category.id)}
               aria-current={activeId === category.id ? "true" : undefined}
             >

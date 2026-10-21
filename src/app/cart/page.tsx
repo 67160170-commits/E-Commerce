@@ -37,7 +37,7 @@ export default async function CartPage() {
           </div>
           <h2 className="mt-4 text-xl font-bold text-ink">ยังไม่มีสินค้าในตะกร้า</h2>
           <p className="mt-2 text-sm text-ink-soft max-w-sm">
-            เลือกดูวิตามินและอาหารเสริมเพื่อสุขภาพที่คุณต้องการ แล้วเพิ่มลงตะกร้าได้เลย
+            เลือกยาดมกลิ่นที่คุณชอบ แล้วเพิ่มลงตะกร้าได้เลย
           </p>
           <Link
             href="/"

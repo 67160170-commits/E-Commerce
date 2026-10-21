@@ -6,9 +6,10 @@ export default function Footer() {
     <footer className="mt-16 border-t border-line bg-white">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-8 sm:flex-row sm:items-center sm:justify-between text-xs text-ink-soft">
         <div>
-          <p className="font-semibold text-ink">VitaShop — วิตามินและอาหารเสริมเพื่อสุขภาพ</p>
+          <p className="text-lg font-bold text-brand">✳ My YaDom.</p>
+          <p className="mt-2">โลกของยาดมไทย ที่หอมเป็นคุณ</p>
           <p className="mt-0.5">
-            โปรเจกต์วิชา E-Commerce เพื่อการศึกษา ข้อมูลสินค้าและคำอธิบายเป็นข้อมูลสมมติ
+            โปรเจกต์วิชา E-Commerce · ราคา สต็อก และคำบรรยายกลิ่นเป็นข้อมูลตัวอย่าง
           </p>
         </div>
 

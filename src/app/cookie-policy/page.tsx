@@ -4,7 +4,7 @@ import CookieSettingsTrigger from "../../components/CookieSettingsTrigger";
 
 export const metadata: Metadata = {
   title: "นโยบายการใช้คุกกี้ (Cookie Policy)",
-  description: "รายละเอียดการใช้งานคุกกี้และเทคโนโลยีการติดตามของเว็บไซต์ VitaShop ตาม พ.ร.บ.คุ้มครองข้อมูลส่วนบุคคล พ.ศ. 2562 (PDPA)",
+  description: "รายละเอียดการใช้งานคุกกี้และเทคโนโลยีการติดตามของเว็บไซต์ My YaDom ตาม พ.ร.บ.คุ้มครองข้อมูลส่วนบุคคล พ.ศ. 2562 (PDPA)",
 };
 
 export default function CookiePolicyPage() {
@@ -102,21 +102,21 @@ export default function CookiePolicyPage() {
                   <tr>
                     <td className="p-3 font-mono font-semibold text-ink">vitashop_session</td>
                     <td className="p-3 text-brand font-medium">จำเป็น (Necessary)</td>
-                    <td className="p-3">VitaShop (First party)</td>
+                    <td className="p-3">My YaDom (First party)</td>
                     <td className="p-3">7 วัน (Persistent)</td>
                     <td className="p-3">รักษาสถานะเข้าสู่ระบบของผู้ใช้งานอย่างปลอดภัย</td>
                   </tr>
                   <tr>
                     <td className="p-3 font-mono font-semibold text-ink">vitashop_cart</td>
                     <td className="p-3 text-brand font-medium">จำเป็น (Necessary)</td>
-                    <td className="p-3">VitaShop (First party)</td>
+                    <td className="p-3">My YaDom (First party)</td>
                     <td className="p-3">30 วัน (Persistent)</td>
                     <td className="p-3">จดจำรายการสินค้าที่ผู้ใช้เลือกไว้ในตะกร้า</td>
                   </tr>
                   <tr>
                     <td className="p-3 font-mono font-semibold text-ink">vitashop_cookie_consent</td>
                     <td className="p-3 text-brand font-medium">จำเป็น (Necessary)</td>
-                    <td className="p-3">VitaShop (First party)</td>
+                    <td className="p-3">My YaDom (First party)</td>
                     <td className="p-3">1 ปี (Local Storage)</td>
                     <td className="p-3">บันทึกตัวเลือกความยินยอมคุกกี้ของผู้ใช้ ไม่ต้องถามซ้ำทุกครั้ง</td>
                   </tr>
@@ -142,7 +142,7 @@ export default function CookiePolicyPage() {
             href="/"
             className="text-sm font-semibold text-brand hover:underline"
           >
-            ← กลับสู่หน้าหลัก VitaShop
+            ← กลับสู่หน้าหลัก My YaDom
           </Link>
         </div>
       </div>

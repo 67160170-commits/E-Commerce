@@ -7,8 +7,8 @@ import ThirdPartyScripts from "@/components/ThirdPartyScripts";
 import CookieConsentBanner from "@/components/CookieConsentBanner";
 
 export const metadata: Metadata = {
-  title: { default: "VitaShop | วิตามินและอาหารเสริม", template: "%s | VitaShop" },
-  description: "ร้านวิตามินและอาหารเสริมออนไลน์ ค้นหาและเลือกดูสินค้าตามหมวดหมู่",
+  title: { default: "My YaDom | รวมยาดมไทย จัดอันดับกลิ่นที่คุณรัก", template: "%s | My YaDom" },
+  description: "ค้นพบยาดมไทย เลือกกลิ่นที่ชอบ รีวิวและจัดอันดับความหอม พร้อมช้อปในที่เดียว",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

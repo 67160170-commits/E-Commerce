@@ -5,7 +5,7 @@ import { getCurrentUser } from "@/lib/auth";
 
 export const metadata: Metadata = {
   title: "สมัครสมาชิก",
-  description: "สร้างบัญชีผู้ใช้ใหม่สำหรับสั่งซื้อสินค้าใน VitaShop",
+  description: "สร้างบัญชีผู้ใช้ใหม่สำหรับสั่งซื้อสินค้าใน My YaDom",
 };
 
 export default async function RegisterPage({

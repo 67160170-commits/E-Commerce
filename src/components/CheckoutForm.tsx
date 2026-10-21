@@ -214,7 +214,7 @@ export default function CheckoutForm({
               <div className="text-sm">
                 <span className="font-semibold text-ink">โอนเงินผ่านบัญชีธนาคาร (Bank Transfer)</span>
                 <p className="mt-0.5 text-xs text-ink-soft">
-                  โอนเงินผ่าน Mobile Banking บัญชีธนาคารกสิกรไทย 123-4-56789-0 (VitaShop)
+                  โอนเงินผ่าน Mobile Banking บัญชีธนาคารกสิกรไทย 123-4-56789-0 (My YaDom)
                 </p>
               </div>
             </label>

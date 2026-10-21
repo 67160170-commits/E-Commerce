@@ -2,6 +2,7 @@
 
 export const SORT_OPTIONS = [
   { key: "recommended", label: "แนะนำ" },
+  { key: "rating", label: "หอมติดอันดับ" },
   { key: "price-asc", label: "ราคาต่ำ-สูง" },
   { key: "price-desc", label: "ราคาสูง-ต่ำ" },
   { key: "name", label: "ชื่อ ก-ฮ" },

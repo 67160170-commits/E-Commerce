@@ -5,8 +5,8 @@ import { getAdminStats } from "@/lib/admin";
 
 export const metadata: Metadata = {
   title: {
-    default: "ระบบจัดการหลังบ้าน | VitaShop Admin",
-    template: "%s | VitaShop Admin",
+    default: "ระบบจัดการหลังบ้าน | My YaDom Admin",
+    template: "%s | My YaDom Admin",
   },
 };
 
@@ -28,7 +28,7 @@ export default async function AdminLayout({
               <span className="rounded-md bg-brand px-2 py-0.5 text-xs font-bold text-white uppercase tracking-wider">
                 Admin Panel
               </span>
-              <h1 className="text-xl font-bold text-ink">ระบบจัดการหลังบ้าน VitaShop</h1>
+              <h1 className="text-xl font-bold text-ink">ระบบจัดการหลังบ้าน My YaDom</h1>
             </div>
             <p className="mt-0.5 text-xs text-ink-soft">
               เข้าสู่ระบบโดย: <span className="font-semibold text-ink">{admin.name}</span> ({admin.email})

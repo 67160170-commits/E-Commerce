@@ -5,7 +5,7 @@ import { getCurrentUser } from "@/lib/auth";
 
 export const metadata: Metadata = {
   title: "เข้าสู่ระบบ",
-  description: "เข้าสู่ระบบบัญชีผู้ใช้ VitaShop",
+  description: "เข้าสู่ระบบบัญชีผู้ใช้ My YaDom",
 };
 
 export default async function LoginPage({
@@ -25,7 +25,7 @@ export default async function LoginPage({
       <div className="rounded-2xl border border-line bg-white p-6 sm:p-8 shadow-sm">
         <div className="mb-6 text-center">
           <h1 className="text-2xl font-bold text-ink">เข้าสู่ระบบ</h1>
-          <p className="mt-1 text-sm text-ink-soft">ยินดีต้อนรับกลับสู่ VitaShop</p>
+          <p className="mt-1 text-sm text-ink-soft">ยินดีต้อนรับกลับสู่ My YaDom</p>
         </div>
         <LoginForm redirectTo={redirectTo} />
       </div>
