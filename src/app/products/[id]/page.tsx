@@ -10,6 +10,7 @@ import { getProduct } from "@/lib/products";
 import { getCurrentUser } from "@/lib/auth";
 import { getMyReview, listReviews } from "@/lib/reviews";
 import ReviewForm from "@/components/ReviewForm";
+import photoSources from "../../../../public/products/photos/sources.json";
 
 export const dynamic = "force-dynamic";
 
@@ -29,6 +30,7 @@ export default async function ProductPage(props: PageProps<"/products/[id]">) {
   const product = id ? getProduct(id) : undefined;
   if (!product) notFound();
 
+  const photoSource = photoSources.find((photo) => photo.file === product.image_url);
   const status = stockStatus(product);
   const user = await getCurrentUser();
   const reviews = listReviews(product.id);
@@ -47,12 +49,20 @@ export default async function ProductPage(props: PageProps<"/products/[id]">) {
       </nav>
 
       <div className="mt-4 grid gap-8 md:grid-cols-2">
-        <ProductImage
-          categoryId={product.category_id}
-          imageUrl={product.image_url}
-          alt={product.name}
-          className="aspect-square w-full rounded-xl border border-line"
-        />
+        <div>
+          <ProductImage
+            categoryId={product.category_id}
+            imageUrl={product.image_url}
+            alt={product.name}
+            className="aspect-square w-full rounded-xl border border-line bg-white"
+          />
+          {photoSource && (
+            <p className="mt-3 text-xs leading-6 text-ink-soft">
+              ภาพสินค้า: <a href={photoSource.sourcePage} target="_blank" rel="noopener noreferrer" className="text-brand underline">{photoSource.credit}</a>
+              <br />ภาพอาจแสดงสีหรือบรรจุภัณฑ์หลายแบบ ราคาต่อสินค้า 1 ชิ้น
+            </p>
+          )}
+        </div>
 
         <div>
           <p className="text-sm text-ink-soft">{product.category_name}</p>
@@ -70,7 +80,7 @@ export default async function ProductPage(props: PageProps<"/products/[id]">) {
           <h2 className="mt-6 font-semibold">รายละเอียดสินค้า</h2>
           <p className="mt-1 max-w-prose leading-relaxed text-ink-soft">{product.description}</p>
           <p className="mt-4 text-sm text-brand">{product.review_count ? `★ ${product.average_rating?.toFixed(2)} / 5 จาก ${product.review_count} คะแนนความหอม` : "☆ ยังไม่มีคะแนนความหอม มาเป็นคนแรกที่รีวิว"}</p>
-          <p className="mt-3 text-xs leading-6 text-ink-soft">ราคา สต็อก และคำบรรยายกลิ่นเป็นข้อมูลตัวอย่าง ภาพประกอบไม่ใช่บรรจุภัณฑ์จริง</p>
+          <p className="mt-3 text-xs leading-6 text-ink-soft">ราคา สต็อก และคำบรรยายกลิ่นเป็นข้อมูลตัวอย่าง บรรจุภัณฑ์อาจเปลี่ยนตามรุ่นการผลิต</p>
 
           <div className="mt-8">
             <AddToCartButton

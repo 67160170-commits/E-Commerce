@@ -10,7 +10,8 @@
     "db:seed": "node db/seed.mjs",
     "check:cookies": "node scripts/check-no-cookies.mjs",
     "db:migrate:yadom": "node db/migrate-yadom.mjs",
-    "test:yadom": "node --test scripts/test-yadom.mjs"
+    "test:yadom": "node --test scripts/test-yadom.mjs",
+    "db:photos": "node db/update-product-photos.mjs"
   },
   "dependencies": {
     "@fontsource-variable/noto-sans-thai": "^5.3.0",

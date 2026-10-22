@@ -1,4 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
+"use client";
+
+import { useState } from "react";
 
 // แต่ละหมวดมีสีของตัวเอง ใช้กับภาพขวด placeholder ตอนที่สินค้ายังไม่มี image_url
 const PALETTE = [
@@ -17,8 +20,9 @@ type Props = {
 };
 
 export default function ProductImage({ categoryId, imageUrl, alt, className = "" }: Props) {
-  if (imageUrl) {
-    return <img src={imageUrl} alt={alt} loading="lazy" className={`object-cover ${className}`} />;
+  const [failedUrl, setFailedUrl] = useState<string | null>(null);
+  if (imageUrl && failedUrl !== imageUrl) {
+    return <img src={imageUrl} alt={alt} loading="lazy" onError={() => setFailedUrl(imageUrl)} className={`object-contain ${className}`} />;
   }
 
   const color = PALETTE[(categoryId - 1) % PALETTE.length];

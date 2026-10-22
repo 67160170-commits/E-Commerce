@@ -3,6 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { catalog } from "./yadom-catalog.mjs";
+import { applyProductPhotos } from "./apply-product-photos.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const dbPath = process.env.DATABASE_PATH ?? path.join(root, "data", "shop.db");
@@ -11,7 +12,7 @@ const db = new Database(dbPath);
 db.pragma("foreign_keys = ON");
 db.exec("CREATE TABLE IF NOT EXISTS schema_migrations (name TEXT PRIMARY KEY, applied_at TEXT NOT NULL DEFAULT (datetime('now')))");
 if (db.prepare("SELECT 1 FROM schema_migrations WHERE name = ?").get("my-yadom-v1")) {
-  console.log("My YaDom migration already applied; no data changed.");
+  console.log("My YaDom catalog migration already applied.");
 } else {
   // SQLite backup includes WAL contents; never copy an open .db file directly.
   const backup = `${dbPath}.before-yadom-${Date.now()}.bak`;
@@ -31,4 +32,6 @@ if (db.prepare("SELECT 1 FROM schema_migrations WHERE name = ?").get("my-yadom-v
   })();
   console.log(`My YaDom ready. Original accounts and orders preserved. Backup: ${backup}`);
 }
+const photoCount = applyProductPhotos(db);
+if (photoCount) console.log(`Updated ${photoCount} sample product photos.`);
 db.close();

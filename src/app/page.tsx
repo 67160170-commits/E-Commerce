@@ -33,14 +33,14 @@ export default async function CatalogPage(props: PageProps<"/">) {
             <div className="mt-7 flex flex-wrap items-center gap-5"><Link href="#catalog" className="primary-pill">ค้นหายาดมที่ใช่ <span aria-hidden>↗</span></Link><Link href="/rankings" className="text-link">ดูอันดับความหอม →</Link></div>
             <div className="hero-note"><span className="text-xl" aria-hidden>✿</span><p>ยาดมเล็ก ๆ ความชอบที่ไม่เหมือนใคร<br /><span>ค้นพบ · ให้คะแนน · ช้อป ในที่เดียว</span></p></div>
           </div>
-          <div className="hero-art" aria-label="ภาพวาดยาดมหลากสไตล์">
+          <div className="hero-art" aria-label="ภาพยาดมจริงหลากสไตล์">
             <span className="art-orbit" /><span className="art-spark" aria-hidden>✳</span>
             <span className="art-tag">THAI LITTLE ESSENTIALS</span>
-            <div className="art-bottle art-bottle-left"><ProductImage categoryId={1} imageUrl="/products/tube-mint.svg" alt="ภาพประกอบยาดมแบบหลอด" className="h-full w-full" /></div>
-            <div className="art-bottle art-bottle-center"><ProductImage categoryId={1} imageUrl="/products/herbal-green.svg" alt="ภาพประกอบยาดมสมุนไพร" className="h-full w-full" /></div>
-            <div className="art-bottle art-bottle-right"><ProductImage categoryId={1} imageUrl="/products/tube-orange.svg" alt="ภาพประกอบยาดมอโรมา" className="h-full w-full" /></div>
+            <div className="art-bottle art-bottle-left"><ProductImage categoryId={1} imageUrl="/products/photos/peppermint-original.jpg" alt="ยาดมเป๊ปเปอร์มิ้นท์ ฟิลด์" className="h-full w-full" /></div>
+            <div className="art-bottle art-bottle-center"><ProductImage categoryId={1} imageUrl="/products/photos/hongthai-formula-2.jpg" alt="ยาดมสมุนไพรหงส์ไทย สูตร 2" className="h-full w-full" /></div>
+            <div className="art-bottle art-bottle-right"><ProductImage categoryId={1} imageUrl="/products/photos/peppermint-orange.jpg" alt="ยาดมเป๊ปเปอร์มิ้นท์ ฟิลด์ กลิ่นส้ม" className="h-full w-full" /></div>
             <span className="art-sticker">small jar,<br /><strong>big freshness.</strong></span>
-            <span className="art-caption">ภาพประกอบจำลอง ไม่ใช่บรรจุภัณฑ์จริง</span>
+            <span className="art-caption">ภาพสินค้าจากแบรนด์และร้านค้า · ดูเครดิตในรายละเอียดสินค้า</span>
           </div>
         </section>
         <div className="brand-strip"><span>YOUR EVERYDAY FRESHNESS</span><span>โป๊ยเซียน</span><span>หงส์ไทย</span><span>เซียงเพียว</span><span>PEPPERMINT FIELD</span><span className="text-brand" aria-hidden>✳</span></div>
@@ -61,7 +61,7 @@ export default async function CatalogPage(props: PageProps<"/">) {
             <nav aria-label="เรียงลำดับสินค้า" className="flex flex-wrap items-center gap-3"><span className="text-ink-soft">เรียงตาม</span>{SORT_OPTIONS.map((option) => <Link key={option.key} href={`${catalogHref({ q, category: activeCategory?.id, sort: option.key })}#catalog`} aria-current={sort === option.key ? "true" : undefined} className={sort === option.key ? "font-semibold text-brand underline underline-offset-4" : "text-ink-soft hover:text-brand"}>{option.label}</Link>)}</nav>
           </div>
           {products.length ? <ul className="mt-6 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">{products.map((product) => <ProductCard key={product.id} product={product} />)}</ul> : <div className="my-6 rounded-2xl border border-dashed border-line p-12 text-center"><h3 className="font-semibold">ยังไม่พบกลิ่นที่ค้นหา</h3><p className="mt-2 text-sm text-ink-soft">ลองใช้ชื่อแบรนด์ หรือเลือกหมวดหมู่อื่น</p><Link href="/#catalog" className="mt-5 inline-block text-sm text-brand underline">ดูยาดมทั้งหมด</Link></div>}
-          <p className="mt-5 text-xs leading-6 text-ink-soft">ราคา สต็อก และคำบรรยายกลิ่นเป็นข้อมูลตัวอย่างสำหรับการศึกษา ภาพเป็นภาพประกอบจำลอง</p>
+          <p className="mt-5 text-xs leading-6 text-ink-soft">ราคา สต็อก และคำบรรยายกลิ่นเป็นข้อมูลตัวอย่างสำหรับการศึกษา ภาพสินค้าจริงจากแบรนด์และร้านค้า</p>
         </section>
         {!filtered && <><RankingSection products={allProducts} /><section className="community-banner"><span className="community-flower" aria-hidden>✳</span><div><p className="eyebrow">A SCENT OF COMMUNITY</p><h2>ความหอม ไม่มีคำตอบเดียว</h2><p className="mt-3 text-sm leading-7">ชอบกลิ่นไหน บอกต่อกลิ่นนั้น<br />ให้คะแนนยาดมที่เคยลอง แล้วช่วยเพื่อน ๆ ค้นพบกลิ่นใหม่</p></div><Link href="/rankings" className="primary-pill">ร่วมค้นหากลิ่นโปรด ↗</Link></section></>}
       </div>
