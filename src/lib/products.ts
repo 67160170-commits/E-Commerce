@@ -22,7 +22,7 @@ export type Product = ProductDetails & {
 
 const SORT_SQL: Record<SortKey, string> = {
   recommended: "p.id ASC",
-  rating: "CASE WHEN (SELECT COUNT(*) FROM reviews r WHERE r.product_id = p.id) >= 3 THEN 0 ELSE 1 END, average_rating DESC, review_count DESC, p.id ASC",
+  rating: "average_rating DESC, review_count DESC, p.id ASC",
   "price-asc": "p.price ASC, p.id ASC",
   "price-desc": "p.price DESC, p.id ASC",
   name: "p.name COLLATE NOCASE ASC",

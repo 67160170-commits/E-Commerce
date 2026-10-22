@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { getCurrentUser } from "@/lib/auth";
 import { getPopulatedCart } from "@/lib/cart";
 import { logoutAction } from "@/app/actions/auth";
@@ -12,8 +13,7 @@ export default async function Header() {
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-3.5">
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center gap-2 text-xl font-bold tracking-tight text-brand-deep">
-            <span aria-hidden className="brand-mark">✳</span>
-            <span>My YaDom<span className="ml-1 text-brand">.</span></span>
+            <Image src="/brand/my-yadom-logo.png" alt="My YaDom" width={80} height={80} className="h-16 w-16 object-contain sm:h-20 sm:w-20" loading="eager" />
           </Link>
           <nav aria-label="เมนูหลัก" className="hidden items-center gap-5 text-sm text-ink-soft lg:flex">
             <Link href="/#catalog" className="hover:text-brand">รวมยาดม</Link>

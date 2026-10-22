@@ -88,9 +88,9 @@ test("login attempts are persisted, throttled and expire", () => {
     assert.doesNotThrow(()=>recordLoginAttempt(db,"test@example.test",1901));
   } finally { db.close(); }
 });
-test("rankings require three ratings and use vote count to break equal-score ties", () => {
+test("a single five-star vote can rank first; equal scores use vote count", () => {
   const ranked=rankProducts([{id:1,average_rating:5,review_count:1},{id:2,average_rating:4.5,review_count:3},{id:3,average_rating:4.5,review_count:5},{id:4,average_rating:null,review_count:0}]);
-  assert.deepEqual(ranked.map(p=>p.id),[3,2]);
+  assert.deepEqual(ranked.map(p=>p.id),[1,3,2]);
 });
 
 test("cart explicitly blocks unavailable or reduced-stock items without silently changing quantities", () => {
