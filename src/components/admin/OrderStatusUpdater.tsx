@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import type { OrderStatus } from "@/lib/orders";
+import { nextOrderStatuses } from "@/lib/commerce";
 import { updateOrderStatusAction } from "@/app/actions/admin";
 
 const STATUSES: { value: OrderStatus; label: string }[] = [
@@ -16,11 +17,13 @@ export default function OrderStatusUpdater({
   orderId,
   currentStatus,
   currentTrackingNumber,
+  paymentMethod,
   compact = false,
 }: {
   orderId: number;
   currentStatus: OrderStatus;
   currentTrackingNumber: string | null;
+  paymentMethod?: "cod" | "bank_transfer";
   compact?: boolean;
 }) {
   const [status, setStatus] = useState<OrderStatus>(currentStatus);
@@ -30,6 +33,8 @@ export default function OrderStatusUpdater({
   const [isPending, startTransition] = useTransition();
   const [message, setMessage] = useState<string>("");
 
+  const available = STATUSES.filter((option) => nextOrderStatuses(currentStatus).includes(option.value) && !(paymentMethod === "bank_transfer" && currentStatus === "pending" && option.value === "shipped"));
+
   const handleUpdate = (newStatus: OrderStatus, newTracking: string) => {
     setStatus(newStatus);
     startTransition(async () => {
@@ -38,6 +43,7 @@ export default function OrderStatusUpdater({
         setMessage("บันทึกสำเร็จ ✓");
         setTimeout(() => setMessage(""), 2500);
       } else {
+        setStatus(currentStatus);
         setMessage(res.error || "เกิดข้อผิดพลาด");
       }
     });
@@ -52,13 +58,14 @@ export default function OrderStatusUpdater({
           onChange={(e) => handleUpdate(e.target.value as OrderStatus, trackingNumber)}
           className="rounded-lg border border-line bg-white px-2 py-1 text-xs font-medium text-ink focus:border-brand focus:outline-none"
         >
-          {STATUSES.map((s) => (
+          {available.map((s) => (
             <option key={s.value} value={s.value}>
               {s.label}
             </option>
           ))}
         </select>
         {isPending && <span className="text-[10px] text-ink-soft">...</span>}
+        {message && <span role="status" className="text-xs text-ink-soft">{message}</span>}
       </div>
     );
   }
@@ -83,7 +90,7 @@ export default function OrderStatusUpdater({
             onChange={(e) => setStatus(e.target.value as OrderStatus)}
             className="w-full rounded-xl border border-line bg-white px-3 py-2 text-sm font-medium text-ink focus:border-brand focus:outline-none"
           >
-            {STATUSES.map((s) => (
+            {available.map((s) => (
               <option key={s.value} value={s.value}>
                 {s.label}
               </option>

@@ -1,6 +1,7 @@
 import "server-only";
 import { cookies } from "next/headers";
 import { getProduct, type Product } from "./products";
+import { positiveInteger } from "./commerce";
 
 export type CartItem = {
   productId: number;
@@ -34,8 +35,8 @@ export async function getCart(): Promise<CartItem[]> {
       (item) =>
         item &&
         typeof item.productId === "number" &&
-        Number.isInteger(item.productId) &&
-        typeof item.quantity === "number" &&
+        Number.isSafeInteger(item.productId) && item.productId > 0 &&
+        typeof item.quantity === "number" && Number.isSafeInteger(item.quantity) &&
         item.quantity > 0
     );
   } catch {
@@ -66,11 +67,11 @@ export async function getPopulatedCart(): Promise<CartSummary> {
   let itemCount = 0;
 
   for (const item of rawItems) {
-    const product = getProduct(item.productId);
+    const product = getProduct(item.productId, true);
     if (!product) continue;
 
-    // จำนวนสินค้าจริงไม่เกินสต็อกคงเหลือ
-    const qty = Math.min(item.quantity, Math.max(1, product.stock));
+    // Show the requested amount. Stock changes are explicit, never silently clamped at checkout.
+    const qty = item.quantity;
     const subtotal = product.price * qty;
 
     populated.push({
@@ -90,7 +91,8 @@ export async function getPopulatedCart(): Promise<CartSummary> {
 }
 
 export async function addToCart(productId: number, quantity = 1): Promise<void> {
-  if (quantity <= 0) return;
+  positiveInteger(productId, "รหัสสินค้า");
+  positiveInteger(quantity, "จำนวนสินค้า");
   const product = getProduct(productId);
   if (!product || product.stock <= 0) {
     throw new Error("สินค้าหมดหรือไม่พร้อมจำหน่าย");
@@ -111,6 +113,8 @@ export async function addToCart(productId: number, quantity = 1): Promise<void> 
 }
 
 export async function updateCartQuantity(productId: number, quantity: number): Promise<void> {
+  positiveInteger(productId, "รหัสสินค้า");
+  if (!Number.isSafeInteger(quantity) || quantity < 0) throw new Error("จำนวนสินค้าไม่ถูกต้อง");
   const items = await getCart();
   if (quantity <= 0) {
     const filtered = items.filter((i) => i.productId !== productId);

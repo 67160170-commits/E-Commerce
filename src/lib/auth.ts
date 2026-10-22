@@ -1,9 +1,10 @@
 import "server-only";
-import crypto from "node:crypto";
+import { signSession, verifySession } from "./session-security";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import bcrypt from "bcryptjs";
 import { getDb } from "./db";
+import { recordLoginAttempt } from "./auth-throttle";
 
 export type User = {
   id: number;
@@ -14,48 +15,7 @@ export type User = {
 };
 
 const SESSION_COOKIE_NAME = "vitashop_session";
-const SESSION_SECRET = process.env.SESSION_SECRET || "vitashop-super-secret-key-67160170";
 const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 7; // 7 วัน
-
-type SessionPayload = {
-  userId: number;
-  exp: number;
-};
-
-function sign(payload: SessionPayload): string {
-  const data = Buffer.from(JSON.stringify(payload)).toString("base64url");
-  const signature = crypto
-    .createHmac("sha256", SESSION_SECRET)
-    .update(data)
-    .digest("base64url");
-  return `${data}.${signature}`;
-}
-
-function verify(token: string): SessionPayload | null {
-  const parts = token.split(".");
-  if (parts.length !== 2) return null;
-  const [data, signature] = parts;
-  const expectedSig = crypto
-    .createHmac("sha256", SESSION_SECRET)
-    .update(data)
-    .digest("base64url");
-
-  // ป้องกัน timing attack
-  if (
-    signature.length !== expectedSig.length ||
-    !crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSig))
-  ) {
-    return null;
-  }
-
-  try {
-    const payload = JSON.parse(Buffer.from(data, "base64url").toString("utf8")) as SessionPayload;
-    if (payload.exp < Math.floor(Date.now() / 1000)) return null;
-    return payload;
-  } catch {
-    return null;
-  }
-}
 
 export function getUserById(id: number): User | null {
   const row = getDb()
@@ -83,9 +43,9 @@ export async function registerUser(name: string, email: string, password: string
   const cleanEmail = email.trim().toLowerCase();
   const cleanName = name.trim();
 
-  if (!cleanName) throw new Error("กรุณากรอกชื่อ-นามสกุล");
-  if (!cleanEmail || !cleanEmail.includes("@")) throw new Error("กรุณากรอกอีเมลให้ถูกต้อง");
-  if (!password || password.length < 6) throw new Error("รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร");
+  if (!cleanName || cleanName.length > 100) throw new Error("กรุณากรอกชื่อไม่เกิน 100 ตัวอักษร");
+  if (cleanEmail.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) throw new Error("กรุณากรอกอีเมลให้ถูกต้อง");
+  if (!password || password.length < 8 || Buffer.byteLength(password, "utf8") > 72) throw new Error("รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร และไม่เกิน 72 ไบต์");
 
   const existing = getUserByEmail(cleanEmail);
   if (existing) {
@@ -106,16 +66,22 @@ export async function registerUser(name: string, email: string, password: string
 
 export async function loginUser(email: string, password: string): Promise<User> {
   const cleanEmail = email.trim().toLowerCase();
+  if (cleanEmail.length > 254 || password.length > 256) throw new Error("ข้อมูลเข้าสู่ระบบไม่ถูกต้อง");
+  const attemptKey = recordLoginAttempt(getDb(), cleanEmail);
   const user = getUserByEmail(cleanEmail);
   if (!user) {
     throw new Error("อีเมลหรือรหัสผ่านไม่ถูกต้อง");
   }
 
+  if (process.env.NODE_ENV === "production" && ["admin@vitashop.com", "customer@vitashop.com"].includes(cleanEmail) && await verifyPassword("123456", user.password_hash)) {
+    throw new Error("บัญชีสาธิตเดิมไม่สามารถใช้บนระบบออนไลน์ กรุณาเปลี่ยนรหัสผ่านผ่านผู้ดูแล");
+  }
   const valid = await verifyPassword(password, user.password_hash);
   if (!valid) {
     throw new Error("อีเมลหรือรหัสผ่านไม่ถูกต้อง");
   }
 
+  getDb().prepare("DELETE FROM auth_attempts WHERE key = ?").run(attemptKey);
   return {
     id: user.id,
     name: user.name,
@@ -127,7 +93,7 @@ export async function loginUser(email: string, password: string): Promise<User> 
 
 export async function setSessionCookie(userId: number) {
   const cookieStore = await cookies();
-  const token = sign({
+  const token = signSession({
     userId,
     exp: Math.floor(Date.now() / 1000) + SESSION_MAX_AGE_SECONDS,
   });
@@ -151,7 +117,7 @@ export async function getCurrentUser(): Promise<User | null> {
   const tokenCookie = cookieStore.get(SESSION_COOKIE_NAME);
   if (!tokenCookie || !tokenCookie.value) return null;
 
-  const payload = verify(tokenCookie.value);
+  const payload = verifySession(tokenCookie.value);
   if (!payload) return null;
 
   return getUserById(payload.userId);

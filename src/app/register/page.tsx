@@ -1,3 +1,4 @@
+import { safeRedirect } from "@/lib/safe-redirect";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import RegisterForm from "@/components/RegisterForm";
@@ -17,7 +18,7 @@ export default async function RegisterPage({
   const { redirect: redirectTo } = await searchParams;
 
   if (user) {
-    redirect(redirectTo || "/");
+    redirect(safeRedirect(redirectTo));
   }
 
   return (

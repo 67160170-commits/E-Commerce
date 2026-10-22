@@ -11,7 +11,11 @@
     "check:cookies": "node scripts/check-no-cookies.mjs",
     "db:migrate:yadom": "node db/migrate-yadom.mjs",
     "test:yadom": "node --test scripts/test-yadom.mjs",
-    "db:photos": "node db/update-product-photos.mjs"
+    "db:photos": "node db/update-product-photos.mjs",
+    "setup": "node scripts/setup-env.mjs",
+    "db:upgrade": "node db/upgrade-catalog.mjs",
+    "test:commerce": "node --test scripts/test-commerce.mjs",
+    "account:reset": "node scripts/reset-account-password.mjs"
   },
   "dependencies": {
     "@fontsource-variable/noto-sans-thai": "^5.3.0",

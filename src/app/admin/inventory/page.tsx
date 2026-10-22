@@ -16,24 +16,25 @@ export const metadata: Metadata = {
 export default async function AdminInventoryPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; category?: string; low_stock?: string }>;
+  searchParams: Promise<{ q?: string; category?: string; low_stock?: string; visibility?: string }>;
 }) {
-  const { q, category, low_stock } = await searchParams;
+  const { q, category, low_stock, visibility } = await searchParams;
   const categoryId = category ? Number(category) : undefined;
   const lowStockOnly = low_stock === "1";
 
-  const categories = listCategories();
+  const categories = listCategories(true);
   const products = listAdminProducts({
     q,
     categoryId: Number.isInteger(categoryId) ? categoryId : undefined,
     lowStockOnly,
+    active: visibility === "all" ? undefined : visibility !== "inactive",
   });
 
   const allProducts = listAdminProducts();
   const lowStockCount = allProducts.filter(
     (p) => p.is_active === 1 && p.stock <= p.low_stock_threshold && p.stock > 0
   ).length;
-  const outOfStockCount = allProducts.filter((p) => p.stock === 0).length;
+  const outOfStockCount = allProducts.filter((p) => p.is_active === 1 && p.stock === 0).length;
 
   return (
     <div className="space-y-6">
@@ -68,6 +69,7 @@ export default async function AdminInventoryPage({
             className="rounded-xl border border-line bg-paper px-3 py-2 text-sm focus:border-brand focus:outline-none"
           />
 
+          <select name="visibility" defaultValue={visibility ?? "active"} aria-label="สถานะการขาย" className="rounded-xl border border-line bg-paper px-3 py-2 text-sm"><option value="active">เปิดขายอยู่</option><option value="inactive">ปิดการขาย / ข้อมูลเดิม</option><option value="all">ทั้งหมด รวมประวัติเดิม</option></select>
           <select
             name="category"
             defaultValue={category ?? ""}

@@ -1,8 +1,10 @@
 import "server-only";
 import { getDb } from "./db";
+import { archiveProduct, changeOrderStatus, categorySales } from "./commerce";
+import type { ProductDetails } from "./product-fields";
 import type { OrderStatus, PaymentMethod } from "./orders";
 
-export type AdminProduct = {
+export type AdminProduct = ProductDetails & {
   id: number;
   name: string;
   description: string;
@@ -45,6 +47,7 @@ export function listAdminProducts(options?: {
   q?: string;
   categoryId?: number;
   lowStockOnly?: boolean;
+  active?: boolean;
 }): AdminProduct[] {
   const db = getDb();
   const where: string[] = [];
@@ -61,6 +64,7 @@ export function listAdminProducts(options?: {
     values.push(options.categoryId);
   }
 
+  if (typeof options?.active === "boolean") { where.push("p.is_active = ?"); values.push(options.active ? 1 : 0); }
   if (options?.lowStockOnly) {
     where.push("p.stock <= p.low_stock_threshold");
   }
@@ -69,7 +73,7 @@ export function listAdminProducts(options?: {
 
   return db
     .prepare(
-      `SELECT p.id, p.name, p.description, p.price, p.image_url, p.category_id,
+      `SELECT p.id, p.name, p.description, p.price, p.image_url, p.category_id, p.brand, p.scent, p.size, p.ingredients, p.usage, p.source_url,
               c.name AS category_name, p.stock, p.low_stock_threshold, p.is_active, p.created_at
          FROM products p
          JOIN categories c ON c.id = p.category_id
@@ -82,7 +86,7 @@ export function listAdminProducts(options?: {
 export function getAdminProduct(id: number): AdminProduct | null {
   const row = getDb()
     .prepare(
-      `SELECT p.id, p.name, p.description, p.price, p.image_url, p.category_id,
+      `SELECT p.id, p.name, p.description, p.price, p.image_url, p.category_id, p.brand, p.scent, p.size, p.ingredients, p.usage, p.source_url,
               c.name AS category_name, p.stock, p.low_stock_threshold, p.is_active, p.created_at
          FROM products p
          JOIN categories c ON c.id = p.category_id
@@ -100,12 +104,17 @@ export function createAdminProduct(data: {
   stock: number;
   low_stock_threshold: number;
   image_url?: string | null;
+  brand?: string; scent?: string; size?: string; ingredients?: string; usage?: string; source_url?: string;
 }): number {
+  if (!Number.isSafeInteger(data.category_id) || data.category_id < 1) throw new Error("หมวดหมู่สินค้าไม่ถูกต้อง");
+  if (!Number.isSafeInteger(data.low_stock_threshold) || data.low_stock_threshold < 0) throw new Error("เกณฑ์สต็อกไม่ถูกต้อง");
+  if (data.image_url && !/^\/(?!\/)|^https?:\/\//.test(data.image_url)) throw new Error("ลิงก์รูปภาพไม่ถูกต้อง");
+  validateProductInput(data);
   const cleanName = data.name.trim();
   if (!cleanName) throw new Error("กรุณาระบุชื่อสินค้า");
-  if (data.price < 0) throw new Error("ราคาต้องไม่ต่ำกว่า 0");
-  if (data.stock < 0) throw new Error("สต็อกต้องไม่ต่ำกว่า 0");
-  if (data.low_stock_threshold < 0) throw new Error("เกณฑ์สต็อกต่ำต้องไม่ต่ำกว่า 0");
+  if (!Number.isSafeInteger(data.price) || data.price < 0) throw new Error("ราคาต้องไม่ต่ำกว่า 0");
+  if (!Number.isSafeInteger(data.stock) || data.stock < 0) throw new Error("สต็อกต้องไม่ต่ำกว่า 0");
+  if (!Number.isSafeInteger(data.low_stock_threshold) || data.low_stock_threshold < 0) throw new Error("เกณฑ์สต็อกต่ำต้องไม่ต่ำกว่า 0");
 
   const db = getDb();
   const result = db
@@ -123,7 +132,9 @@ export function createAdminProduct(data: {
       data.image_url?.trim() || null
     );
 
-  return Number(result.lastInsertRowid);
+  const id = Number(result.lastInsertRowid);
+  saveDetails(db, id, data);
+  return id;
 }
 
 export function updateAdminProduct(
@@ -136,13 +147,15 @@ export function updateAdminProduct(
     stock: number;
     low_stock_threshold: number;
     image_url?: string | null;
+  brand?: string; scent?: string; size?: string; ingredients?: string; usage?: string; source_url?: string;
     is_active: number;
   }
 ): void {
+  validateProductInput(data);
   const cleanName = data.name.trim();
   if (!cleanName) throw new Error("กรุณาระบุชื่อสินค้า");
-  if (data.price < 0) throw new Error("ราคาต้องไม่ต่ำกว่า 0");
-  if (data.stock < 0) throw new Error("สต็อกต้องไม่ต่ำกว่า 0");
+  if (!Number.isSafeInteger(data.price) || data.price < 0) throw new Error("ราคาต้องไม่ต่ำกว่า 0");
+  if (!Number.isSafeInteger(data.stock) || data.stock < 0) throw new Error("สต็อกต้องไม่ต่ำกว่า 0");
 
   const db = getDb();
   db.prepare(
@@ -161,29 +174,20 @@ export function updateAdminProduct(
     data.is_active ? 1 : 0,
     id
   );
+  saveDetails(db, id, data);
 }
 
 export function updateAdminProductStock(id: number, stock: number): void {
-  if (stock < 0) throw new Error("จำนวนสต็อกต้องไม่ต่ำกว่า 0");
-  getDb()
+  if (!Number.isSafeInteger(id) || id < 1) throw new Error("รหัสสินค้าไม่ถูกต้อง");
+  if (!Number.isSafeInteger(stock) || stock < 0) throw new Error("จำนวนสต็อกต้องไม่ต่ำกว่า 0");
+  const result = getDb()
     .prepare("UPDATE products SET stock = ? WHERE id = ?")
     .run(Math.floor(stock), id);
+  if (!result.changes) throw new Error("ไม่พบสินค้า");
 }
 
 export function deleteAdminProduct(id: number): void {
-  const db = getDb();
-  // ตรวจสอบว่าเคยมีในออเดอร์หรือไม่
-  const countRow = db
-    .prepare("SELECT COUNT(*) AS c FROM order_items WHERE product_id = ?")
-    .get(id) as { c: number };
-
-  if (countRow.c > 0) {
-    // หากมีออเดอร์แล้ว ให้ soft-delete เพื่อรักษาประวัติคำสั่งซื้อ
-    db.prepare("UPDATE products SET is_active = 0 WHERE id = ?").run(id);
-  } else {
-    // หากยังไม่เคยถูกสั่งซื้อ สามารถลบถาวรได้
-    db.prepare("DELETE FROM products WHERE id = ?").run(id);
-  }
+  archiveProduct(getDb(), id);
 }
 
 export function listAdminOrders(options?: {
@@ -258,21 +262,8 @@ export function getAdminOrder(id: number): {
   return { order, items };
 }
 
-export function updateAdminOrderStatus(
-  orderId: number,
-  status: OrderStatus,
-  trackingNumber?: string | null
-): void {
-  const db = getDb();
-  if (trackingNumber !== undefined) {
-    db.prepare("UPDATE orders SET status = ?, tracking_number = ? WHERE id = ?").run(
-      status,
-      trackingNumber ? trackingNumber.trim() : null,
-      orderId
-    );
-  } else {
-    db.prepare("UPDATE orders SET status = ? WHERE id = ?").run(status, orderId);
-  }
+export function updateAdminOrderStatus(orderId: number, status: OrderStatus, trackingNumber?: string | null): void {
+  changeOrderStatus(getDb(), orderId, status, trackingNumber);
 }
 
 export function getAdminStats() {
@@ -436,18 +427,7 @@ export function getAdminDashboardData() {
     }[];
 
   // ยอดขายแยกตามหมวดหมู่สินค้า
-  const salesByCategory = db
-    .prepare(
-      `SELECT c.name AS category_name,
-              COALESCE(SUM(oi.quantity * oi.unit_price), 0) AS total_revenue,
-              COALESCE(SUM(oi.quantity), 0) AS total_sold
-         FROM categories c
-         LEFT JOIN products p ON p.category_id = c.id
-         LEFT JOIN order_items oi ON oi.product_id = p.id
-        GROUP BY c.id
-        ORDER BY total_revenue DESC`
-    )
-    .all() as { category_name: string; total_revenue: number; total_sold: number }[];
+  const salesByCategory = categorySales(db);
 
   const consentCount = (
     db.prepare("SELECT COUNT(*) AS c FROM consent_logs").get() as { c: number }
@@ -466,3 +446,20 @@ export function getAdminDashboardData() {
   };
 }
 
+
+function saveDetails(db: ReturnType<typeof getDb>, id: number, data: Partial<ProductDetails>) {
+  for (const field of ["brand", "scent", "size", "ingredients", "usage", "source_url"] as const) {
+    if (data[field] !== undefined) db.prepare(`UPDATE products SET ${field} = ? WHERE id = ?`).run(data[field]?.trim() || "", id);
+  }
+}
+
+function validateProductInput(data: { category_id: number; low_stock_threshold: number; image_url?: string | null; source_url?: string }) {
+  if (!Number.isSafeInteger(data.category_id) || data.category_id < 1 || !Number.isSafeInteger(data.low_stock_threshold) || data.low_stock_threshold < 0) throw new Error("หมวดหมู่หรือเกณฑ์สต็อกไม่ถูกต้อง");
+  for (const [key, value] of [["image", data.image_url], ["source", data.source_url]]) {
+    if (!value) continue;
+    if (value.includes(String.fromCharCode(92)) || [...value].some(character => character.charCodeAt(0) < 32)) throw new Error("ลิงก์ไม่ถูกต้อง");
+    if (key === "image" && value.startsWith("/") && !value.startsWith("//")) continue;
+    const url = new URL(value);
+    if (!["https:", "http:"].includes(url.protocol)) throw new Error("ลิงก์ต้องใช้ http หรือ https");
+  }
+}

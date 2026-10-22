@@ -21,6 +21,7 @@ export async function placeOrderAction(
   }
 
   const paymentMethod = (formData.get("payment_method") as PaymentMethod) || "cod";
+  if (!["cod", "bank_transfer"].includes(paymentMethod)) return { error: "วิธีชำระเงินไม่ถูกต้อง" };
   const addressOption = (formData.get("address_option") as string) || "saved";
   let shippingAddressText = "";
 

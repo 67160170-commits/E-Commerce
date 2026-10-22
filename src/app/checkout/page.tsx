@@ -4,12 +4,13 @@ import CheckoutForm from "@/components/CheckoutForm";
 import { getCurrentUser } from "@/lib/auth";
 import { getPopulatedCart } from "@/lib/cart";
 import { getUserAddresses } from "@/lib/addresses";
+import { cartIssue } from "@/lib/commerce";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "ยืนยันการสั่งซื้อและชำระเงิน",
-  description: "กรอกข้อมูลจัดส่งและยืนยันคำสั่งซื้อ VitaShop",
+  description: "กรอกข้อมูลจัดส่งและยืนยันคำสั่งซื้อ My YaDom",
 };
 
 export default async function CheckoutPage() {
@@ -22,6 +23,7 @@ export default async function CheckoutPage() {
   if (items.length === 0) {
     redirect("/cart");
   }
+  if (items.some(item => cartIssue(item.product, item.quantity))) redirect("/cart");
 
   const savedAddresses = getUserAddresses(user.id);
 

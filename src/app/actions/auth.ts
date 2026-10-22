@@ -1,5 +1,7 @@
 "use server";
 
+import { safeRedirect } from "@/lib/safe-redirect";
+
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { clearSessionCookie, loginUser, registerUser, setSessionCookie } from "@/lib/auth";
@@ -24,7 +26,7 @@ export async function loginAction(prevState: AuthState | null, formData: FormDat
   }
 
   revalidatePath("/", "layout");
-  redirect(redirectTo.startsWith("/") ? redirectTo : "/");
+  redirect(safeRedirect(redirectTo));
 }
 
 export async function registerAction(prevState: AuthState | null, formData: FormData): Promise<AuthState> {
@@ -48,7 +50,7 @@ export async function registerAction(prevState: AuthState | null, formData: Form
   }
 
   revalidatePath("/", "layout");
-  redirect(redirectTo.startsWith("/") ? redirectTo : "/");
+  redirect(safeRedirect(redirectTo));
 }
 
 export async function logoutAction(): Promise<void> {

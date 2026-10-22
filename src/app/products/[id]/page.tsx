@@ -10,6 +10,9 @@ import { getProduct } from "@/lib/products";
 import { getCurrentUser } from "@/lib/auth";
 import { getMyReview, listReviews } from "@/lib/reviews";
 import ReviewForm from "@/components/ReviewForm";
+import { MIN_RANKING_REVIEWS } from "@/lib/ranking";
+import { PRODUCT_DETAIL_LABELS } from "@/lib/product-fields";
+import type { ProductDetails } from "@/lib/product-fields";
 import photoSources from "../../../../public/products/photos/sources.json";
 
 export const dynamic = "force-dynamic";
@@ -82,6 +85,8 @@ export default async function ProductPage(props: PageProps<"/products/[id]">) {
           <p className="mt-4 text-sm text-brand">{product.review_count ? `★ ${product.average_rating?.toFixed(2)} / 5 จาก ${product.review_count} คะแนนความหอม` : "☆ ยังไม่มีคะแนนความหอม มาเป็นคนแรกที่รีวิว"}</p>
           <p className="mt-3 text-xs leading-6 text-ink-soft">ราคา สต็อก และคำบรรยายกลิ่นเป็นข้อมูลตัวอย่าง บรรจุภัณฑ์อาจเปลี่ยนตามรุ่นการผลิต</p>
 
+          {product.review_count < MIN_RANKING_REVIEWS && <p className="mt-2 text-xs text-ink-soft">กำลังสะสมคะแนน {product.review_count}/{MIN_RANKING_REVIEWS} · ยังไม่เข้าอันดับหลัก</p>}
+          <dl className="mt-5 divide-y divide-line rounded-xl border border-line bg-white px-4">{(Object.keys(PRODUCT_DETAIL_LABELS) as (keyof ProductDetails)[]).map(field => product[field] && <div key={field} className="grid gap-1 py-3 text-sm sm:grid-cols-[130px_1fr]"><dt className="font-medium">{PRODUCT_DETAIL_LABELS[field]}</dt><dd className="break-words leading-7 text-ink-soft">{field === "source_url" && /^https?:\/\//.test(product[field]) ? <a href={product[field]} target="_blank" rel="noopener noreferrer" className="text-brand underline">ดูข้อมูลจากแบรนด์หรือร้านค้า ↗</a> : product[field]}</dd></div>)}</dl>
           <div className="mt-8">
             <AddToCartButton
               productId={product.id}

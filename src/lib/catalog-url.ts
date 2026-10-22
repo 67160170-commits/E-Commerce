@@ -14,8 +14,9 @@ export function isSortKey(value: unknown): value is SortKey {
   return SORT_OPTIONS.some((option) => option.key === value);
 }
 
-export function catalogHref(params: { q?: string; category?: number; sort?: SortKey }): string {
+export function catalogHref(params: { q?: string; category?: number; sort?: SortKey; brand?: string }): string {
   const search = new URLSearchParams();
+  if (params.brand) search.set("brand", params.brand);
   if (params.q) search.set("q", params.q);
   if (params.category) search.set("category", String(params.category));
   if (params.sort && params.sort !== "recommended") search.set("sort", params.sort);

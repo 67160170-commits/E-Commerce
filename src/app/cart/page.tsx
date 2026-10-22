@@ -3,6 +3,7 @@ import Link from "next/link";
 import CartItemRow from "@/components/CartItemRow";
 import { getPopulatedCart } from "@/lib/cart";
 import { formatPrice } from "@/lib/format";
+import { cartIssue } from "@/lib/commerce";
 
 export const dynamic = "force-dynamic";
 
@@ -13,6 +14,7 @@ export const metadata: Metadata = {
 
 export default async function CartPage() {
   const { items, total, itemCount } = await getPopulatedCart();
+  const needsUpdate = items.some(item => cartIssue(item.product, item.quantity));
 
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-8">
@@ -84,13 +86,13 @@ export default async function CartPage() {
                 </div>
               </dl>
 
-              <Link
+              {needsUpdate ? <p role="alert" className="mt-6 rounded-xl bg-amber-50 p-4 text-sm text-amber-900">สินค้าหรือสต็อกเปลี่ยนแปลง กรุณาปรับจำนวนหรือลบรายการที่ไม่พร้อมขายก่อนสั่งซื้อ</p> : <Link
                 href="/checkout"
                 id="proceed-checkout-btn"
                 className="mt-6 block w-full rounded-xl bg-brand py-3.5 text-center font-semibold text-white shadow-sm transition-colors hover:bg-brand-deep"
               >
                 ดำเนินการสั่งซื้อ
-              </Link>
+              </Link>}
 
               <p className="mt-3 text-center text-xs text-ink-soft">
                 รองรับการชำระเงินปลายทาง (COD) และโอนเงินผ่านธนาคาร

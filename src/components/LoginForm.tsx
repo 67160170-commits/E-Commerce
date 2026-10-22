@@ -59,12 +59,6 @@ export default function LoginForm({ redirectTo }: { redirectTo?: string }) {
         {isPending ? "กำลังเข้าสู่ระบบ..." : "เข้าสู่ระบบ"}
       </button>
 
-      <div className="rounded-xl border border-line bg-paper p-3 text-xs text-ink-soft">
-        <p className="font-semibold text-ink mb-1">บัญชีสำหรับทดสอบระบบ:</p>
-        <p>• ลูกค้า: <code className="text-brand">customer@vitashop.com</code> / รหัสผ่าน: <code className="text-brand">123456</code></p>
-        <p>• แอดมิน: <code className="text-brand">admin@vitashop.com</code> / รหัสผ่าน: <code className="text-brand">123456</code></p>
-      </div>
-
       <p className="text-center text-sm text-ink-soft">
         ยังไม่มีบัญชีผู้ใช้?{" "}
         <Link

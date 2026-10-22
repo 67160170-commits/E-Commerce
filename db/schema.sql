@@ -1,5 +1,5 @@
--- โครงสร้างฐานข้อมูล VitaShop (SQLite)
--- ครบ 7 ตารางตามแผนงานข้อ 4 เพื่อไม่ต้องแก้โครงสร้างในสัปดาห์ถัดไป
+-- โครงสร้างฐานข้อมูล My YaDom (SQLite)
+-- ตารางร้านค้าและการป้องกันการเข้าสู่ระบบ; ตารางรีวิวอยู่ใน reviews.sql
 -- ราคาและยอดเงินเก็บเป็นจำนวนเต็ม หน่วยบาท
 
 PRAGMA foreign_keys = ON;
@@ -32,6 +32,12 @@ CREATE TABLE products (
   id                  INTEGER PRIMARY KEY AUTOINCREMENT,
   name                TEXT    NOT NULL,
   description         TEXT    NOT NULL DEFAULT '',
+  brand TEXT NOT NULL DEFAULT '',
+  scent TEXT NOT NULL DEFAULT '',
+  size TEXT NOT NULL DEFAULT '',
+  ingredients TEXT NOT NULL DEFAULT '',
+  usage TEXT NOT NULL DEFAULT '',
+  source_url TEXT NOT NULL DEFAULT '',
   price               INTEGER NOT NULL CHECK (price >= 0),
   image_url           TEXT,                               -- ว่าง = ใช้ภาพ placeholder
   category_id         INTEGER NOT NULL REFERENCES categories(id),
@@ -81,3 +87,5 @@ CREATE INDEX idx_orders_user       ON orders(user_id);
 CREATE INDEX idx_orders_status     ON orders(status);
 CREATE INDEX idx_order_items_order ON order_items(order_id);
 CREATE INDEX idx_consent_visitor   ON consent_logs(visitor_id);
+
+CREATE TABLE IF NOT EXISTS auth_attempts (key TEXT PRIMARY KEY, attempts INTEGER NOT NULL, started_at INTEGER NOT NULL);

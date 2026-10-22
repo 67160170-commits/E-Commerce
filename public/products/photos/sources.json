@@ -41,9 +41,9 @@
   },
   {
     "key": "poysian-mark-ii",
-    "sourcePage": "https://www.poysian.co.th/ยาดมปอยเซียน-มาร์ค-2/",
-    "original": "https://www.poysian.co.th/wp-content/uploads/2023/12/Product-0001-005-copy-800x800.jpg",
-    "file": "/products/photos/poysian-mark-ii.jpg",
+    "sourcePage": "https://goldmintsproducts.com/",
+    "original": "https://goldmintsproducts.com/img/portfolio/1-thumb.jpg",
+    "file": "/products/photos/poysian-clean.jpg",
     "credit": "Gold Mints Products / Poy-Sian",
     "downloadedAt": "2026-10-22"
   },
@@ -61,6 +61,22 @@
     "original": "https://media.allonline.7eleven.co.th/pdmain/459689-01-medicine-nonprescription-drugs-hongthai.jpg",
     "file": "/products/photos/hongthai-formula-2.jpg",
     "credit": "ALL Online / Hong Thai",
+    "downloadedAt": "2026-10-22"
+  },
+  {
+    "key": "pastel-original",
+    "sourcePage": "https://www.bigc.co.th/product/pastel-pocket-inhaler-2-g-assorted-colors.99995",
+    "original": "https://st.bigc-cs.com/cdn-cgi/image/format%3Dwebp%2Cquality%3D90/public/media/catalog/product/19/88/8859737610219/8859737610219_2-20250314105451-.jpg",
+    "file": "/products/photos/pastel-original.jpg",
+    "credit": "Big C Online / Pastel",
+    "downloadedAt": "2026-10-22"
+  },
+  {
+    "key": "vapex-2in1",
+    "sourcePage": "https://www.bigc.co.th/product/vapex-2in1-inhalant-2-ml.2462257",
+    "original": "https://st.bigc-cs.com/cdn-cgi/image/format%3Dwebp%2Cquality%3D90/public/media/catalog/product/19/88/8850172241419/8850172241419_1-20251002151448-.jpg",
+    "file": "/products/photos/vapex-2in1.jpg",
+    "credit": "Big C Online / Vapex",
     "downloadedAt": "2026-10-22"
   }
 ]

@@ -1,3 +1,4 @@
+import { safeRedirect } from "@/lib/safe-redirect";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import LoginForm from "@/components/LoginForm";
@@ -17,7 +18,7 @@ export default async function LoginPage({
   const { redirect: redirectTo } = await searchParams;
 
   if (user) {
-    redirect(redirectTo || "/");
+    redirect(safeRedirect(redirectTo));
   }
 
   return (

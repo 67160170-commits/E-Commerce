@@ -6,6 +6,7 @@ type Props = {
   categories: Category[];
   activeId?: number;
   q: string;
+  brand?: string;
   sort: SortKey;
 };
 
@@ -17,13 +18,13 @@ function chipClass(active: boolean) {
   }`;
 }
 
-export default function CategoryFilter({ categories, activeId, q, sort }: Props) {
+export default function CategoryFilter({ categories, activeId, q, sort, brand }: Props) {
   return (
     <nav aria-label="หมวดหมู่สินค้า" className="-mx-4 overflow-x-auto px-4">
       <ul className="flex gap-2 pb-1">
         <li>
           <Link
-            href={`${catalogHref({ q, sort })}#catalog`}
+            href={`${catalogHref({ q, sort, brand })}#catalog`}
             className={chipClass(!activeId)}
             aria-current={!activeId ? "true" : undefined}
           >
@@ -33,7 +34,7 @@ export default function CategoryFilter({ categories, activeId, q, sort }: Props)
         {categories.map((category) => (
           <li key={category.id}>
             <Link
-              href={`${catalogHref({ q, sort, category: category.id })}#catalog`}
+              href={`${catalogHref({ q, sort, brand, category: category.id })}#catalog`}
               className={chipClass(activeId === category.id)}
               aria-current={activeId === category.id ? "true" : undefined}
             >

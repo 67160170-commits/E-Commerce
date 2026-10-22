@@ -3,6 +3,8 @@
 import { useActionState } from "react";
 import Link from "next/link";
 import type { Category } from "@/lib/products";
+import { PRODUCT_DETAIL_LABELS } from "@/lib/product-fields";
+import type { ProductDetails } from "@/lib/product-fields";
 import type { AdminProduct } from "@/lib/admin";
 import {
   createProductAction,
@@ -36,6 +38,7 @@ export default function ProductForm({ categories, initialData }: Props) {
       )}
 
       <div className="grid gap-6 sm:grid-cols-2">
+        {(Object.keys(PRODUCT_DETAIL_LABELS) as (keyof ProductDetails)[]).map((field) => <label key={field} className="block text-sm font-medium text-ink">{PRODUCT_DETAIL_LABELS[field]}<input name={field} type={field === "source_url" ? "url" : "text"} defaultValue={initialData?.[field] ?? ""} maxLength={field === "source_url" ? 2000 : 1000} className="mt-1 block w-full rounded-xl border border-line bg-white px-3.5 py-2.5 text-sm" /></label>)}
         {/* ชื่อสินค้า */}
         <div className="sm:col-span-2">
           <label htmlFor="name" className="block text-sm font-medium text-ink">
@@ -132,11 +135,12 @@ export default function ProductForm({ categories, initialData }: Props) {
             ลิงก์รูปภาพสินค้า (Image URL)
           </label>
           <input
-            type="url"
+            type="text"
+            inputMode="url"
             id="image_url"
             name="image_url"
             defaultValue={initialData?.image_url ?? ""}
-            placeholder="https://example.com/image.jpg (หากว่างไว้จะใช้ภาพขวด placeholder ประจำหมวด)"
+            placeholder="/products/photos/image.jpg หรือ https://example.com/image.jpg"
             className="mt-1 block w-full rounded-xl border border-line bg-white px-3.5 py-2.5 text-sm shadow-sm focus:border-brand focus:outline-none"
           />
         </div>
@@ -151,7 +155,7 @@ export default function ProductForm({ categories, initialData }: Props) {
             name="description"
             rows={4}
             defaultValue={initialData?.description ?? ""}
-            placeholder="ระบุสรรพคุณ ส่วนประกอบ และวิธีรับประทาน..."
+            placeholder="ระบุแนวกลิ่น ส่วนประกอบตามฉลาก และวิธีใช้ภายนอก..."
             className="mt-1 block w-full rounded-xl border border-line bg-white px-3.5 py-2.5 text-sm shadow-sm focus:border-brand focus:outline-none"
           />
         </div>

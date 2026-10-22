@@ -1,10 +1,11 @@
 import Link from "next/link";
 import ProductImage from "./ProductImage";
+import { rankProducts, MIN_RANKING_REVIEWS } from "@/lib/ranking";
 import type { Product } from "@/lib/products";
 
 export default function RankingSection({ products, full = false }: { products: Product[]; full?: boolean }) {
   const Heading = full ? "h1" : "h2";
-  const ranked = products.filter((p) => p.review_count > 0);
+  const ranked = rankProducts(products);
   const visible = full ? ranked : ranked.slice(0, 3);
   return (
     <section id="rankings" className="ranking-section scroll-mt-36">
@@ -24,9 +25,10 @@ export default function RankingSection({ products, full = false }: { products: P
           </li>)}
         </ol>
       ) : (
-        <div className="ranking-empty"><span className="text-4xl text-brand" aria-hidden>☆</span><div><h3 className="font-semibold">อันดับแรก อาจเริ่มจากกลิ่นโปรดของคุณ</h3><p className="mt-1 text-sm leading-7 text-ink-soft">ยังไม่มีคะแนน เลือกยาดมที่เคยลองแล้วให้คะแนนเพื่อเริ่มจัดอันดับจริง</p></div><Link href="/#catalog" className="rounded-full border border-brand px-5 py-3 text-sm font-semibold text-brand">เลือกกลิ่นแล้วให้คะแนน ↗</Link></div>
+        <div className="ranking-empty"><span className="text-4xl text-brand" aria-hidden>☆</span><div><h3 className="font-semibold">มาร่วมสร้างอันดับจากหลายความคิดเห็น</h3><p className="mt-1 text-sm leading-7 text-ink-soft">แต่ละสินค้าต้องมีอย่างน้อย 3 คะแนนก่อนเข้าอันดับ เลือกยาดมที่เคยลองแล้วร่วมให้คะแนนได้เลย</p></div><Link href="/#catalog" className="rounded-full border border-brand px-5 py-3 text-sm font-semibold text-brand">เลือกกลิ่นแล้วให้คะแนน ↗</Link></div>
       )}
-      {full && <p className="mt-5 text-xs leading-6 text-ink-soft">วิธีจัดอันดับ: ค่าเฉลี่ยคะแนนมากที่สุดก่อน หากเท่ากันใช้จำนวนผู้ให้คะแนนมากที่สุด แล้วใช้รหัสสินค้าเรียงจากน้อยไปมาก สินค้าที่ยังไม่มีคะแนนยังไม่เข้าร่วมอันดับ รีวิวเป็นความคิดเห็นจากสมาชิกทั่วไป ไม่ได้ยืนยันการซื้อ</p>}
+      {products.some(p => p.review_count < MIN_RANKING_REVIEWS) && <div className="mt-5"><h3 className="text-sm font-semibold">กลิ่นที่กำลังสะสมคะแนน</h3><div className="mt-3 flex flex-wrap gap-2">{products.filter(p => p.review_count < MIN_RANKING_REVIEWS).slice(0, full ? 12 : 3).map(p => <Link key={p.id} href={`/products/${p.id}#reviews`} className="rounded-full border border-line bg-white px-4 py-2 text-xs text-ink-soft">{p.name} · {p.review_count}/{MIN_RANKING_REVIEWS} คะแนน ↗</Link>)}</div></div>}
+      {full && <p className="mt-5 text-xs leading-6 text-ink-soft">วิธีจัดอันดับ: ค่าเฉลี่ยคะแนนมากที่สุดก่อน หากเท่ากันใช้จำนวนผู้ให้คะแนนมากที่สุด แล้วใช้รหัสสินค้าเรียงจากน้อยไปมาก สินค้าต้องมีอย่างน้อย 3 คะแนนจึงเข้าอันดับหลัก รีวิวเป็นความคิดเห็นจากสมาชิกทั่วไป ไม่ได้ยืนยันการซื้อ</p>}
     </section>
   );
 }

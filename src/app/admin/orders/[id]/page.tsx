@@ -61,6 +61,7 @@ export default async function AdminOrderDetailPage({
           <OrderStatusUpdater
             orderId={order.id}
             currentStatus={order.status}
+                              paymentMethod={order.payment_method}
             currentTrackingNumber={order.tracking_number}
           />
 

@@ -7,7 +7,7 @@ export const metadata: Metadata = {
 };
 
 export default function NewProductPage() {
-  const categories = listCategories();
+  const categories = listCategories(true);
 
   return (
     <div className="mx-auto max-w-2xl rounded-2xl border border-line bg-white p-6 sm:p-8 shadow-xs">

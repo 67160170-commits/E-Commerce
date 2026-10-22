@@ -1,5 +1,6 @@
 "use server";
 
+import { readProductDetails } from "@/lib/product-fields";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/auth";
@@ -32,12 +33,13 @@ export async function createProductAction(
   const imageUrl = ((formData.get("image_url") as string) || "").trim() || null;
 
   if (!name) return { error: "กรุณาระบุชื่อสินค้า" };
-  if (isNaN(price) || price < 0) return { error: "กรุณาระบุราคาที่ถูกต้อง" };
-  if (isNaN(categoryId) || categoryId <= 0) return { error: "กรุณาเลือกหมวดหมู่สินค้า" };
-  if (isNaN(stock) || stock < 0) return { error: "กรุณาระบุจำนวนสต็อกที่ถูกต้อง" };
+  if (!Number.isSafeInteger(price) || price < 0) return { error: "กรุณาระบุราคาที่ถูกต้อง" };
+  if (!Number.isSafeInteger(categoryId) || categoryId <= 0) return { error: "กรุณาเลือกหมวดหมู่สินค้า" };
+  if (!Number.isSafeInteger(stock) || stock < 0) return { error: "กรุณาระบุจำนวนสต็อกที่ถูกต้อง" };
 
   try {
     createAdminProduct({
+      ...readProductDetails(formData),
       name,
       description,
       price,
@@ -73,12 +75,13 @@ export async function updateProductAction(
   const isActive = formData.get("is_active") === "1" ? 1 : 0;
 
   if (!name) return { error: "กรุณาระบุชื่อสินค้า" };
-  if (isNaN(price) || price < 0) return { error: "กรุณาระบุราคาที่ถูกต้อง" };
-  if (isNaN(categoryId) || categoryId <= 0) return { error: "กรุณาเลือกหมวดหมู่สินค้า" };
-  if (isNaN(stock) || stock < 0) return { error: "กรุณาระบุจำนวนสต็อกที่ถูกต้อง" };
+  if (!Number.isSafeInteger(price) || price < 0) return { error: "กรุณาระบุราคาที่ถูกต้อง" };
+  if (!Number.isSafeInteger(categoryId) || categoryId <= 0) return { error: "กรุณาเลือกหมวดหมู่สินค้า" };
+  if (!Number.isSafeInteger(stock) || stock < 0) return { error: "กรุณาระบุจำนวนสต็อกที่ถูกต้อง" };
 
   try {
     updateAdminProduct(productId, {
+      ...readProductDetails(formData),
       name,
       description,
       price,

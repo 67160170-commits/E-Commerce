@@ -57,7 +57,7 @@ export default async function AdminDashboardPage() {
         <div className="rounded-2xl border border-line bg-white p-5 shadow-xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold uppercase tracking-wider text-ink-soft">
-              ยอดขายที่ชำระแล้ว
+              ยอดขายที่ยืนยันแล้ว
             </span>
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 font-bold">
               ฿

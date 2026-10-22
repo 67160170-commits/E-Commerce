@@ -35,3 +35,5 @@ if (db.prepare("SELECT 1 FROM schema_migrations WHERE name = ?").get("my-yadom-v
 const photoCount = applyProductPhotos(db);
 if (photoCount) console.log(`Updated ${photoCount} sample product photos.`);
 db.close();
+
+await import("./upgrade-catalog.mjs");

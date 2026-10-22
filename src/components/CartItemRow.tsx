@@ -1,29 +1,35 @@
 "use client";
 
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import Link from "next/link";
 import ProductImage from "./ProductImage";
 import { formatPrice } from "@/lib/format";
 import type { PopulatedCartItem } from "@/lib/cart";
+import { cartIssue } from "@/lib/commerce";
 import { removeFromCartAction, updateCartQuantityAction } from "@/app/actions/cart";
 
 export default function CartItemRow({ item }: { item: PopulatedCartItem }) {
   const [isPending, startTransition] = useTransition();
   const { product, quantity, subtotal } = item;
+  const [error, setError] = useState("");
 
   const handleUpdate = (newQty: number) => {
     startTransition(async () => {
-      await updateCartQuantityAction(product.id, newQty);
+      const result = await updateCartQuantityAction(product.id, newQty);
+      setError(result.success ? "" : result.error || "บันทึกไม่สำเร็จ");
     });
   };
 
   const handleRemove = () => {
     startTransition(async () => {
-      await removeFromCartAction(product.id);
+      const result = await removeFromCartAction(product.id);
+      setError(result.success ? "" : result.error || "ลบไม่สำเร็จ");
     });
   };
 
   return (
+    <div>
+    {error && <p role="alert" className="mb-2 text-sm text-red-700">{error}</p>}
     <div
       className={`flex flex-col gap-4 rounded-xl border border-line bg-white p-4 transition-opacity sm:flex-row sm:items-center sm:justify-between ${
         isPending ? "opacity-60" : "opacity-100"
@@ -35,7 +41,7 @@ export default function CartItemRow({ item }: { item: PopulatedCartItem }) {
             categoryId={product.category_id}
             imageUrl={product.image_url}
             alt={product.name}
-            className="h-20 w-20 rounded-lg border border-line object-cover"
+            className="h-20 w-20 rounded-lg border border-line object-contain"
           />
         </Link>
         <div className="flex flex-col">
@@ -47,6 +53,7 @@ export default function CartItemRow({ item }: { item: PopulatedCartItem }) {
             {product.name}
           </Link>
           <span className="text-sm text-ink-soft mt-1">{formatPrice(product.price)} / ชิ้น</span>
+          {cartIssue(product, quantity) && <p className="mt-1 text-xs text-red-700">{cartIssue(product, quantity)}</p>}
           {product.stock <= 5 && product.stock > 0 && (
             <span className="text-xs text-amber-700 mt-0.5">เหลือเพียง {product.stock} ชิ้น</span>
           )}
@@ -101,6 +108,7 @@ export default function CartItemRow({ item }: { item: PopulatedCartItem }) {
           </svg>
         </button>
       </div>
+    </div>
     </div>
   );
 }

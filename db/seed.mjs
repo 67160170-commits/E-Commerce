@@ -4,6 +4,7 @@
 
 import Database from "better-sqlite3";
 import bcrypt from "bcryptjs";
+import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -23,6 +24,7 @@ db.exec(schema);
 db.exec(fs.readFileSync(path.join(root, "db", "reviews.sql"), "utf8"));
 db.exec("CREATE TABLE schema_migrations (name TEXT PRIMARY KEY, applied_at TEXT NOT NULL DEFAULT (datetime('now'))) ");
 db.prepare("INSERT INTO schema_migrations (name) VALUES (?)").run("my-yadom-v1");
+db.prepare("INSERT INTO schema_migrations (name) VALUES (?)").run("catalog-v2");
 
 const insertCategory = db.prepare("INSERT INTO categories (name, sort_order) VALUES (?, ?)");
 const insertProduct = db.prepare(
@@ -39,12 +41,16 @@ db.transaction(() => {
   });
 
   // สร้างบัญชีผู้ใช้ทดสอบ
-  const passwordHash = bcrypt.hashSync("123456", 10);
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD || crypto.randomBytes(18).toString("base64url");
+  const customerPassword = crypto.randomBytes(18).toString("base64url");
+  if (adminPassword.length < 12) throw new Error("SEED_ADMIN_PASSWORD ต้องมีอย่างน้อย 12 ตัวอักษร");
+  const passwordHash = bcrypt.hashSync(adminPassword, 12);
+  fs.writeFileSync(path.join(path.dirname(dbPath), "local-accounts.txt"), `admin@myyadom.local: ${adminPassword}\ncustomer@myyadom.local: ${customerPassword}\n`);
   const insertUser = db.prepare(
     "INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)"
   );
-  insertUser.run("ผู้ดูแลระบบ My YaDom", "admin@vitashop.com", passwordHash, "admin");
-  const customerRes = insertUser.run("สมชาย ใจดี", "customer@vitashop.com", passwordHash, "customer");
+  insertUser.run("ผู้ดูแลระบบ My YaDom", "admin@myyadom.local", passwordHash, "admin");
+  const customerRes = insertUser.run("สมชาย ใจดี", "customer@myyadom.local", bcrypt.hashSync(customerPassword, 12), "customer");
 
   // สร้างที่อยู่จัดส่งตัวอย่างสำหรับลูกค้าทดสอบ
   const insertAddress = db.prepare(
@@ -72,6 +78,12 @@ console.log(`สร้างฐานข้อมูลที่ ${path.relative
 console.table(summary);
 console.log(`สินค้าทั้งหมด ${total} รายการ`);
 console.log("บัญชีทดสอบ:");
-console.log("  - ผู้ดูแลระบบ: admin@vitashop.com (รหัสผ่าน: 123456)");
-console.log("  - ลูกค้าทั่วไป: customer@vitashop.com (รหัสผ่าน: 123456)");
+console.log("ข้อมูลบัญชีเก็บใน data/local-accounts.txt (ไม่ส่งขึ้น Git)");
+
+const details = JSON.parse(fs.readFileSync(path.join(root, "db", "product-details.json"), "utf8"));
+for (const item of details) {
+  for (const field of ["brand", "scent", "size", "ingredients", "usage", "source_url"]) {
+    if (item[field]) db.prepare(`UPDATE products SET ${field} = ? WHERE name = ?`).run(item[field], item.name);
+  }
+}
 db.close();
